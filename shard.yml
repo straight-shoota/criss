@@ -1,0 +1,18 @@
+name: criss
+version: 0.1.0
+crystal: 0.23.1
+
+authors:
+  - Johannes Müller <straightshoota@gmail.com>
+
+targets:
+  criss:
+    main: src/criss_cli.cr
+
+license: MIT
+
+dependencies:
+  sass:
+    github: straight-shoota/sass.cr
+  crinja:
+    github: straight-shoota/crinja

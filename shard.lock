@@ -1,0 +1,10 @@
+version: 1.0
+shards:
+  crinja:
+    github: straight-shoota/crinja
+    commit: b6203220329c6e47ee126fad2259229166ee5b8c
+
+  sass:
+    github: straight-shoota/sass.cr
+    commit: 2c6ca376f7d9e3b2ea57b856ecd828009283284d
+
