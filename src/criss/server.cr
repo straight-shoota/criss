@@ -22,7 +22,8 @@ class Criss::Server
     @context = Context.new
     @context.generators = [
       SassGenerator.new(@context),
-      HTMLGenerator.new(@context),
+      PageGenerator.new(@context),
+      PostGenerator.new(@context),
     ] of Generator
   end
 

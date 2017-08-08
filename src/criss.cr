@@ -1,22 +1,14 @@
 require "./criss/context"
+require "./criss/entry"
+require "./criss/processor"
 require "./criss/generator"
 require "./criss/version"
+require "yaml"
 
 module Criss
-  def self.read_frontmatter(file)
-    content = File.read(file)
+  alias Frontmatter = Hash(String, Crinja::Type)
+end
 
-    frontmatter, separator, content = content.partition "\n---\n"
-
-    if separator.empty?
-      content = frontmatter
-    elsif !frontmatter.strip.empty?
-      # doen't matter if content.starts_with? "---\n"
-
-      yaml = YAML.parse(frontmatter)
-      return yaml.as_h, content if yaml.raw.is_a?(Hash)
-    end
-
-    return {} of String => String, content
-  end
+module Crinja
+  alias Variables = Hash(Crinja::Type, Crinja::Type)
 end

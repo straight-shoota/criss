@@ -16,3 +16,5 @@ dependencies:
     github: straight-shoota/sass.cr
   crinja:
     github: straight-shoota/crinja
+  markd:
+    github: icyleaf/markd

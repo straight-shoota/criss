@@ -1,27 +1,24 @@
-require "sass"
-
 class Criss::SassGenerator
   include Generator::Base
-  def initialize(context)
-    super(context)
-    @compiler = Sass::Compiler.new(include_path: context.root_path("_sass"))
+
+  @processor : Processor?
+  def processor
+    processor = @processor
+    processor || (@processor = Processor.build_chain([
+        Processor::Sass.new(context),
+        Processor::Crinja.new(context),
+        Processor::Frontmatter.new(context),
+      ]))
   end
 
   def matches?(path)
     if File.extname(path) == ".css"
-      file_path = context.root_path(path.rchop(".css") + ".scss")
-      return file_path if File.file?(file_path)
+      file_path = path.rchop(".css") + ".scss"
+      return file_path if File.file?(context.root_path(file_path))
     end
   end
 
-  def generate(io, path, file_path)
-    _frontmatter, scss_source = Criss.read_frontmatter(file_path)
-    scss = @compiler.compile(scss_source)
-
-    io << scss
-  end
-
-  def content_type(path, file_path)
+  def content_type(entry)
     "text/css"
   end
 end
