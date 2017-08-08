@@ -26,6 +26,10 @@ describe Criss::SassGenerator do
     result = Criss::SassGenerator.new(context).generate "simple.scss"
     result.content_type.should be_nil
   end
+  it "lists entries" do
+    entries = Criss::SassGenerator.new(context).list_entries
+    entries.map { |entry| entry.as(Criss::FileEntry).file_path.should eq "/simple.scss" }
+  end
 end
 
 describe Criss::PageGenerator do
@@ -45,6 +49,11 @@ describe Criss::PageGenerator do
     result = Criss::PageGenerator.new(context).generate "does-not-exist.html"
     result.content_type.should be_nil
   end
+  it "lists entries" do
+    entries = Criss::PageGenerator.new(context).list_entries
+    page_names = ["/index.md", "/simple.html"]
+    entries.map { |entry| page_names.should contain(entry.as(Criss::Page).file_path) }
+  end
 end
 
 describe Criss::PostGenerator do
@@ -63,6 +72,11 @@ describe Criss::PostGenerator do
   it "responds to non-existing html file" do
     result = Criss::PostGenerator.new(context).generate "posts/2017-05-03-does-not-exist.html"
     result.content_type.should be_nil
+  end
+  it "lists entries" do
+    entries = Criss::PostGenerator.new(context).list_entries
+    page_names = ["/_posts/2017-07-16-my-first-post.html", "/_posts/2017-08-07-markdown.md"]
+    entries.map { |entry| page_names.should contain(entry.as(Criss::Post).file_path) }
   end
 end
 

@@ -13,4 +13,10 @@ class Criss::Generator::List
       return result if result
     end
   end
+
+  def list_entries
+    @generators.map do |generator|
+      generator.list_entries
+    end.flatten
+  end
 end

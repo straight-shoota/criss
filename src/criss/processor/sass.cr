@@ -3,6 +3,8 @@ require "sass"
 class Criss::Processor::Sass
   include Processor
 
+  FILE_EXTENSIONS = [".sass", ".scss"]
+
   def initialize(context)
     super(context)
     @compiler = ::Sass::Compiler.new(include_path: context.root_path("_sass"))

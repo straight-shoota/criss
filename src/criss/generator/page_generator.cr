@@ -14,6 +14,30 @@ class Criss::PageGenerator
       ]))
   end
 
+  def list_entries
+    entries = [] of Entry
+    file_glob = "/**/*"
+
+    Dir[context.root_path file_glob].each do |file|
+      if(file_name_matches?(file))
+        file = file.lchop(context.root_path)
+        entries << create_entry(path_for(file), file)
+      end
+    end
+    entries
+  end
+
+  def path_for(file)
+    file.sub(".md", ".html")
+  end
+
+  private def file_name_matches?(file)
+    File.file?(file) \
+      && CONTENT_FILE_EXTENSIONS.includes?(File.extname(file)) \
+      && file[0] != '_' \
+      && file.index("/_") == nil
+  end
+
   def file_path(path)
     if file?(path)
       if CONTENT_FILE_EXTENSIONS.includes? File.extname(path)
@@ -43,7 +67,7 @@ class Criss::PageGenerator
   end
 
   protected def create_entry(path, match_result)
-    Page.new(path, match_result)
+    Page.new(path, match_result, context)
   end
 
   private def test_file_path_extensions(path)

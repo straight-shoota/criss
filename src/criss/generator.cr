@@ -5,6 +5,8 @@ module Criss::Generator
 
   abstract def generate(io : IO, path) : String?
 
+  abstract def list_entries : Array(Entry)
+
   def generate(path)
     content_type = nil
     body = String.build do |io|
@@ -38,7 +40,7 @@ module Criss::Generator
     end
 
     protected def create_entry(path, match_result)
-      Entry.new(path, match_result)
+      FileEntry.new(path, match_result, context)
     end
 
     protected abstract def matches?(path)
@@ -51,6 +53,7 @@ module Criss::Generator
     end
 
     protected abstract def processor : Processor
+
   end
 end
 

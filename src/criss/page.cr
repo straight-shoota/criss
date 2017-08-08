@@ -1,4 +1,4 @@
-class Criss::Page < Criss::Entry
+class Criss::Page < Criss::FileEntry
   def default_variables(context)
     Crinja::Variables{"page" => Crinja.cast_hash(frontmatter)}
   end

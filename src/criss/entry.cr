@@ -1,11 +1,10 @@
-class Criss::Entry
-  getter request_path : String
-  getter file_path : String
-  property frontmatter = Frontmatter.new
-  getter slug : String
+abstract class Criss::Entry
+  include ::Crinja::PyObject
 
-  def initialize(@request_path, @file_path)
-    @slug = File.basename(file_path, File.extname(file_path))
+  getter request_path : String
+  property frontmatter = Frontmatter.new
+
+  def initialize(@request_path)
   end
 
   def default_variables(context)
@@ -22,7 +21,10 @@ class Criss::Entry
       "path" => request_path,
     }
   end
+
+  macro inherited
+    ::Crinja::PyObject.getattr
+  end
 end
 
-require "./page"
-require "./post"
+require "./file_entry"

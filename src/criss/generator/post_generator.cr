@@ -14,16 +14,20 @@ class Criss::PostGenerator
   end
 
   def list_entries
-    entries = [] of Post
+    entries = [] of Entry
     file_glob = "_posts/*"
 
-    Dir[context.root_path file_glob].each do |file|
+    Dir[context.root_path(file_glob)].each do |file|
       if(file_name_matches?(file))
         file = file.lchop(context.root_path)
-        entries << Post.new(path_for(file), file)
+        entries << create_entry(path_for(file), file)
       end
     end
     entries
+  end
+
+  def path_for(file)
+    file.sub("_posts", "posts").sub(".md", ".html")
   end
 
   def file_name(path)
@@ -36,7 +40,7 @@ class Criss::PostGenerator
   end
 
   protected def create_entry(path, match_result)
-    Post.new(path, match_result)
+    Post.new(path, match_result, context)
   end
 
   private def file_name_matches?(file)

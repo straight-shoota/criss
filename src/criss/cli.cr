@@ -10,10 +10,10 @@ module Criss::CLI
     exit
   end
 
-  def self.run
+  def self.run(options = ARGV)
     server = Criss::Server.new
 
-    OptionParser.parse! do |opts|
+    OptionParser.parse(options) do |opts|
       path = Dir.current
 
       opts.on("--version", "") { puts Criss::VERSION; exit }
@@ -32,6 +32,15 @@ module Criss::CLI
       end
     end
 
-    server.start
+    case command = options.shift?
+    when "serve", nil
+      server.start
+    when "list"
+      server.handler.list_entries.each do |entry|
+        puts entry.inspect
+      end
+    else
+      puts "unrecognised command: #{command}"
+    end
   end
 end

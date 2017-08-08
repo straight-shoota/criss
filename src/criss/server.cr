@@ -13,7 +13,7 @@ class Criss::Server
   getter! server : HTTP::Server
   getter! loader : Crinja::Loader
   getter context : Context
-  getter! generators : Array(Generator)
+  getter handler : CrissHandler
 
   include Crinja::PyObject
   getattr host, port
@@ -25,6 +25,8 @@ class Criss::Server
       PageGenerator.new(@context),
       PostGenerator.new(@context),
     ] of Generator
+
+    @handler = CrissHandler.new(context)
   end
 
   def start
@@ -51,7 +53,7 @@ class Criss::Server
       HTTP::ErrorHandler.new,
       HTTP::LogHandler.new,
       HTTP::StaticFileHandler.new(context.root_path, directory_listing: false),
-      CrissHandler.new(context),
+      handler,
     ]
 
     @server = HTTP::Server.new(host, port, handlers)
