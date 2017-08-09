@@ -1,9 +1,7 @@
+require "http"
+
 class Criss::Server::CrissHandler < Criss::Generator::List
   include HTTP::Handler
-
-  def initialize(context)
-    super(context, context.generators)
-  end
 
   def call(context)
     path = context.request.path.lchop

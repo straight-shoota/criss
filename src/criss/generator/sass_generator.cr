@@ -1,5 +1,5 @@
 class Criss::SassGenerator
-  include Generator::Base
+  include Generator::Base(FileEntry)
 
   FILE_EXTENSIONS = Processor::Sass::FILE_EXTENSIONS + [".css"]
 
@@ -13,17 +13,15 @@ class Criss::SassGenerator
       ]))
   end
 
-  def list_entries
-    entries = [] of Entry
+  def each_entry
     file_glob = "/**/*"
 
     Dir[context.root_path file_glob].each do |file|
       if(file_name_matches?(file))
         file = file.lchop(context.root_path)
-        entries << create_entry(path_for(file), file)
+        yield create_entry(path_for(file), file)
       end
     end
-    entries
   end
 
   def path_for(file)
@@ -42,5 +40,13 @@ class Criss::SassGenerator
       file_path = path.rchop(".css") + ".scss"
       return file_path if File.file?(context.root_path(file_path))
     end
+  end
+
+  private def generate_entry?(entry)
+    entry.content_type == "text/css"
+  end
+
+  def create_entry(path, file_path)
+    FileEntry.new(path, file_path, context, content_type: "text/css")
   end
 end

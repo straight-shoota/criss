@@ -1,31 +1,19 @@
-require "crinja"
-require "crinja/server"
-require "yaml"
-
+require "colorize"
 class Criss::Server
   DEFAULT_HOST = "0.0.0.0"
   DEFAULT_PORT = 3000
 
   property host : String = DEFAULT_HOST
   property port : Int32 = DEFAULT_PORT
-  property logger : Logger = Logger.new(STDERR)
 
   getter! server : HTTP::Server
-  getter! loader : Crinja::Loader
   getter context : Context
   getter handler : CrissHandler
 
   include Crinja::PyObject
   getattr host, port
 
-  def initialize(@root_path = ".")
-    @context = Context.new
-    @context.generators = [
-      SassGenerator.new(@context),
-      PageGenerator.new(@context),
-      PostGenerator.new(@context),
-    ] of Generator
-
+  def initialize(@context = Context.new)
     @handler = CrissHandler.new(context)
   end
 

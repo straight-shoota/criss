@@ -3,9 +3,17 @@ module Criss::Generator
   def initialize(@context)
   end
 
-  abstract def generate(io : IO, path) : String?
+  abstract def generate(io : IO, entry) : String?
 
-  abstract def list_entries : Array(Entry)
+  abstract def each_entry(&block : Entry -> )
+
+  def list_entries
+    entries = [] of Entry
+    each_entry do |entry|
+      entries << entry
+    end
+    entries
+  end
 
   def generate(path)
     content_type = nil
@@ -18,13 +26,13 @@ module Criss::Generator
 
   record Result, path : String, body : String, content_type : String?
 
-  module Base
+  module Base(T)
     include Generator
 
     def initialize(@context)
     end
 
-    def generate(io, path)
+    def generate(io, path : String)
       match_result = matches?(path)
       return nil unless match_result
 
@@ -45,11 +53,20 @@ module Criss::Generator
 
     protected abstract def matches?(path)
 
-    def generate(io, entry : Entry)
+    def generate(io, entry : T)
+      return nil unless generate_entry?(entry)
       context.logger.debug "Rendering file_path #{entry.file_path}"
 
       file = File.open(context.root_path(entry.file_path))
       processor.process(entry, file, io)
+    end
+
+    def generate(io, entry)
+      nil
+    end
+
+    private def generate_entry?(entry)
+      true
     end
 
     protected abstract def processor : Processor

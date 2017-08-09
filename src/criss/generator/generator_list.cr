@@ -3,20 +3,27 @@ class Criss::Generator::List
 
   getter generators : Array(Generator)
 
+  def self.new(context)
+    new(context, context.generators)
+  end
+
   def initialize(context, @generators)
     super(context)
   end
 
-  def generate(io, path)
+  delegate generators, to: context
+
+  def generate(io, entry)
     @generators.each do |generator|
-      result = generator.generate(io, path)
+      result = generator.generate(io, entry)
       return result if result
     end
   end
 
-  def list_entries
-    @generators.map do |generator|
-      generator.list_entries
-    end.flatten
+  def each_entry(&block : Entry ->)
+    # block needs to be captured to avoid infinite inlining
+    @generators.each do |generator|
+      generator.each_entry(&block)
+    end
   end
 end

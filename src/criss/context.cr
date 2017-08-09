@@ -4,6 +4,7 @@ class Criss::Context
   include Crinja::PyObject
 
   property root_path : String
+  property build_dir : String = "_build"
   property crinja : Environment
   property logger : Logger = Logger.new(STDOUT)
   property generators : Array(Generator) = [] of Generator
@@ -12,10 +13,24 @@ class Criss::Context
     @crinja.config.liquid_compatibility_mode = true
 
     @crinja.loader = Crinja::Loader::FileSystemLoader.new(root_path("_includes"))
+
+    @generators = [
+      SassGenerator.new(self),
+      PageGenerator.new(self),
+      PostGenerator.new(self),
+    ] of Generator
   end
 
   def root_path(path)
     File.join(@root_path, path)
+  end
+
+  def build_path(path)
+    build_path = File.join(@root_path, @build_dir, path)
+    if build_path[-1] == File::SEPARATOR
+      build_path = File.join(build_path, "index.html")
+    end
+    build_path
   end
 
   def default_variables

@@ -1,7 +1,7 @@
 class Criss::PostGenerator
-  include Generator::Base
+  include Generator::Base(Post)
 
-  CONTENT_FILE_EXTENSIONS = Processor::Markdown::FILE_EXTENSIONS + {".html", ".htm"}
+  FILE_EXTENSIONS = Processor::Markdown::FILE_EXTENSIONS + {".html", ".htm"}
 
   @processor : Processor?
   def processor
@@ -13,21 +13,24 @@ class Criss::PostGenerator
       ]))
   end
 
-  def list_entries
-    entries = [] of Entry
+  def each_entry
     file_glob = "_posts/*"
 
     Dir[context.root_path(file_glob)].each do |file|
       if(file_name_matches?(file))
         file = file.lchop(context.root_path)
-        entries << create_entry(path_for(file), file)
+        yield create_entry(path_for(file), file)
       end
     end
-    entries
   end
 
   def path_for(file)
-    file.sub("_posts", "posts").sub(".md", ".html")
+    file = file.sub("_posts", "posts")
+    FILE_EXTENSIONS.each do |ext|
+      file = file.rchop(ext)
+    end
+    file += "/"
+    file
   end
 
   def file_name(path)
@@ -44,7 +47,7 @@ class Criss::PostGenerator
   end
 
   private def file_name_matches?(file)
-    File.file?(file) && CONTENT_FILE_EXTENSIONS.includes? File.extname(file)
+    File.file?(file) && FILE_EXTENSIONS.includes? File.extname(file)
   end
 
   def matches?(path)

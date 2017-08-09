@@ -1,5 +1,6 @@
 require "option_parser"
 require "./server"
+require "./site_generator"
 
 module Criss::CLI
   def self.display_help_and_exit(opts)
@@ -11,14 +12,15 @@ module Criss::CLI
   end
 
   def self.run(options = ARGV)
-    server = Criss::Server.new
+    context = Context.new
+    server = Criss::Server.new(context)
 
     OptionParser.parse(options) do |opts|
       path = Dir.current
 
       opts.on("--version", "") { puts Criss::VERSION; exit }
-      opts.on("-v", "--verbose", "") { server.logger.level = Logger::Severity::DEBUG }
-      opts.on("-q", "--quiet", "") { server.logger.level = Logger::Severity::WARN }
+      opts.on("-v", "--verbose", "") { context.logger.level = Logger::Severity::DEBUG }
+      opts.on("-q", "--quiet", "") { context.logger.level = Logger::Severity::WARN }
       opts.on("-h", "--help", "") { self.display_help_and_exit(opts) }
       opts.on("-b HOST", "--bind=HOST", "Bind to host (default: #{Server::DEFAULT_HOST}") do |host|
         server.host = host
@@ -36,9 +38,12 @@ module Criss::CLI
     when "serve", nil
       server.start
     when "list"
-      server.handler.list_entries.each do |entry|
-        puts entry.inspect
+      server.handler.each_entry do |entry|
+        puts entry
       end
+    when "build"
+      generator = SiteGenerator.new
+      generator.generate_all
     else
       puts "unrecognised command: #{command}"
     end

@@ -1,7 +1,8 @@
 class Criss::Post < Criss::FileEntry
   def default_variables(context)
     Crinja::Variables{
-      "post" => Crinja.cast_hash(frontmatter)
+      "post" => Crinja.cast_hash(frontmatter),
+      "page" => Crinja.cast_hash(frontmatter),
     }
   end
 
