@@ -1,4 +1,6 @@
 require "colorize"
+require "./server/log_pretty_handler"
+
 class Criss::Server
   DEFAULT_HOST = "0.0.0.0"
   DEFAULT_PORT = 3000
@@ -7,14 +9,13 @@ class Criss::Server
   property port : Int32 = DEFAULT_PORT
 
   getter! server : HTTP::Server
-  getter context : Context
-  getter handler : CrissHandler
+  getter site : Site
+  getter! handler : CrissHandler
 
   include Crinja::PyObject
   getattr host, port
 
-  def initialize(@context = Context.new)
-    @handler = CrissHandler.new(context)
+  def initialize(@site)
   end
 
   def start
@@ -37,10 +38,12 @@ class Criss::Server
   def setup
     return unless @server.nil?
 
+    @handler = CrissHandler.new()
+
     handlers = [
       HTTP::ErrorHandler.new,
-      HTTP::LogHandler.new,
-      HTTP::StaticFileHandler.new(context.root_path, directory_listing: false),
+      LogPrettyHandler.new(STDOUT, colors: site.config.use_colors?),
+      #HTTP::StaticFileHandler.new(site.source_path, directory_listing: false),
       handler,
     ]
 

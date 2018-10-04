@@ -10,16 +10,15 @@ class Criss::PageGenerator
     processor || (@processor = Processor.build_chain([
         Processor::Crinja.new(context),
         Processor::Markdown.new(context),
-        Processor::Frontmatter.new(context),
       ]))
   end
 
   def each_entry
     file_glob = "/**/*"
 
-    Dir[context.root_path file_glob].each do |file|
+    Dir[site.source_path file_glob].each do |file|
       if(file_name_matches?(file))
-        file = file.lchop(context.root_path)
+        file = file.lchop(site.source_path)
         yield create_entry(path_for(file), file)
       end
     end
@@ -69,7 +68,7 @@ class Criss::PageGenerator
   end
 
   protected def create_entry(path, match_result)
-    Page.new(path, match_result, context)
+    Page.new(context, path, match_result)
   end
 
   private def test_file_path_extensions(path)
@@ -80,7 +79,7 @@ class Criss::PageGenerator
   end
 
   private def file?(file)
-    File.file?(context.root_path(file))
+    File.file?(site.source_path(file))
   end
 
   def matches?(path)

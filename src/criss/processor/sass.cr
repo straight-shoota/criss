@@ -5,9 +5,9 @@ class Criss::Processor::Sass
 
   FILE_EXTENSIONS = [".sass", ".scss"]
 
-  def initialize(context)
-    super(context)
-    @compiler = ::Sass::Compiler.new(include_path: context.root_path("_sass"))
+  def initialize(site)
+    super(site)
+    @compiler = ::Sass::Compiler.new(include_path: site.source_path("_sass"))
   end
 
   def process(entry, input, output)

@@ -1,8 +1,8 @@
 module Criss::Processor
-  getter context : Context
+  getter site : Site
   property! next : Processor
 
-  def initialize(@context)
+  def initialize(@site)
   end
 
   abstract def process(entry, input, output)

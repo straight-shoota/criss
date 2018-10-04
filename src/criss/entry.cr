@@ -1,35 +1,45 @@
 abstract class Criss::Entry
   include ::Crinja::PyObject
+  include Comparable(Entry)
 
-  getter request_path : String
-  property content_type : String
-  property frontmatter = Frontmatter.new
+  property site : Site
+  getter path : String
+  property content_type : String? = nil
+  property frontmatter : Frontmatter
 
-  def initialize(@request_path, @content_type = "text/html")
+  private def initialize(@site, @path, frontmatter)
+    @frontmatter = default_frontmatter.merge(frontmatter)
   end
 
-  def default_variables(context)
+  def default_variables
     Crinja::Variables.new
   end
 
-  def default_frontmatter(context)
+  delegate :[], :[]?, to: @frontmatter
+
+  def default_frontmatter
     Frontmatter{
-      "url" => context.url_for(request_path),
-      "path" => request_path,
+      "url"  => site.url_for(@path),
+      "path" => @path,
+      "dir"  => dir,
     }
   end
 
-  def to_s(io)
-    io << self.class
-    io << "("
-    io << request_path
-    io << ", "
-    io << content_type
-    io << ")"
+  def dir
+    if @path.ends_with?('/')
+      @path
+    else
+      target_dir = File.dirname(@path)
+      target_dir.ends_with?('/') ? target_dir : target_dir + '/'
+    end
   end
 
-  macro inherited
-    ::Crinja::PyObject.getattr
+  def <=>(other : Entry)
+    @path <=> other.path
+  end
+
+  def to_s(io)
+    io << self.class << "(" << @path << ", " << content_type << ")"
   end
 end
 

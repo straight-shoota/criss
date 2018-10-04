@@ -9,16 +9,15 @@ class Criss::SassGenerator
     processor || (@processor = Processor.build_chain([
         Processor::Sass.new(context),
         Processor::Crinja.new(context),
-        Processor::Frontmatter.new(context),
       ]))
   end
 
   def each_entry
     file_glob = "/**/*"
 
-    Dir[context.root_path file_glob].each do |file|
+    Dir[site.source_path file_glob].each do |file|
       if(file_name_matches?(file))
-        file = file.lchop(context.root_path)
+        file = file.lchop(site.source_path)
         yield create_entry(path_for(file), file)
       end
     end
@@ -38,8 +37,11 @@ class Criss::SassGenerator
   def matches?(path)
     if File.extname(path) == ".css"
       file_path = path.rchop(".css") + ".scss"
-      return file_path if File.file?(context.root_path(file_path))
+      return file_path if File.file?(site.source_path(file_path))
+
+      context.logger.debug("extension matches #{self} but file #{file_path} does not exist")
     end
+    nil
   end
 
   private def generate_entry?(entry)
@@ -47,6 +49,6 @@ class Criss::SassGenerator
   end
 
   def create_entry(path, file_path)
-    FileEntry.new(path, file_path, context, content_type: "text/css")
+    FileEntry.new(context, path, file_path, content_type: "text/css")
   end
 end

@@ -1,6 +1,6 @@
 name: criss
 version: 0.1.0
-crystal: 0.23.1
+crystal: 0.24.1
 
 authors:
   - Johannes Müller <straightshoota@gmail.com>
@@ -18,3 +18,5 @@ dependencies:
     github: straight-shoota/crinja
   markd:
     github: icyleaf/markd
+  serve:
+    github: superpaintman/serve

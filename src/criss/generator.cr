@@ -42,6 +42,8 @@ module Criss::Generator
         entry = create_entry(path, match_result)
       end
 
+      context.logger.debug "Using #{self} for #{entry}"
+
       generate(io, entry)
 
       entry.content_type
@@ -57,7 +59,8 @@ module Criss::Generator
       return nil unless generate_entry?(entry)
       context.logger.debug "Rendering file_path #{entry.file_path}"
 
-      file = File.open(context.root_path(entry.file_path))
+      #file = File.open(site.source_path(entry.file_path))
+      file = IO::Memory.new(entry.load)
       processor.process(entry, file, io)
     end
 
@@ -74,4 +77,4 @@ module Criss::Generator
   end
 end
 
-require "./generator/*"
+#require "./generator/*"

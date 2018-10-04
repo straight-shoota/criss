@@ -1,19 +1,23 @@
 require "crinja"
+require "../crinja_lib"
 
 class Criss::Processor::Crinja
   include Processor
-  delegate crinja, to: context
+  delegate crinja, to: site
 
   def load_template(path)
-    file_path = context.root_path(path)
+    file_path = site.source_path(path)
     unless File.readable?(file_path)
       raise ::Crinja::TemplateNotFoundError.new(path)
     end
-    file = File.read(file_path)
-    frontmatter, content = Processor::Frontmatter.read_frontmatter(file)
-    template = ::Crinja::Template.new(content, crinja, path, path)
 
-    return frontmatter, template
+    File.open(file_path) do |file|
+      frontmatter = FrontmatterReader.read_frontmatter(file) || raise "empty frontmatter"
+      content = file.gets_to_end
+      template = ::Crinja::Template.new(content, crinja, path, path)
+
+      return frontmatter, template
+    end
   end
 
   def layout_path(path)
@@ -31,7 +35,7 @@ class Criss::Processor::Crinja
       return
     end
 
-    #context.logger.debug "using layout #{layout_name}"
+    #site.logger.debug "using layout #{layout_name}"
     frontmatter, layout = load_layout(layout_name)
 
     if parent_layout = frontmatter["layout"]?
@@ -49,8 +53,8 @@ class Criss::Processor::Crinja
       process_next(entry, input, io)
     end
 
-    template = ::Crinja::Template.new(source, crinja, entry.request_path, entry.file_path)
-    vars = context.default_variables.merge(entry.default_variables(context))
+    template = ::Crinja::Template.new(source, crinja, entry.path, entry.source_path)
+    vars = entry.site.default_variables.merge(entry.default_variables)
 
     vars["content"] = render_template(template, vars)
 
