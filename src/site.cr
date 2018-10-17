@@ -1,9 +1,8 @@
 require "./resource"
 require "./pipeline"
 require "./config"
+require "./collection"
 require "yaml"
-
-alias Criss::Collection = Array(Resource)
 
 class Criss::Site
   getter config : Config
@@ -11,7 +10,7 @@ class Criss::Site
   getter site_dir : String
 
   getter files : Array(Resource) = [] of Resource
-  getter collections = {} of String => Array(Resource)
+  getter collections = {} of String => Collection
 
   getter generators : Array(Generator) = [] of Generator
 
@@ -22,6 +21,15 @@ class Criss::Site
 
     @pipeline_builder = uninitialized Pipeline::Builder
     @pipeline_builder = Pipeline::Builder.new(self)
+
+    init_collections
+  end
+
+  private def init_collections
+    config.collections.each do |name, collection_config|
+      collection = Collection.new(name, collection_config)
+      collections[name] = collection
+    end
   end
 
   def self.new(site_dir : String)

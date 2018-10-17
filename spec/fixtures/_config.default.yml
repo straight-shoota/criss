@@ -8,6 +8,8 @@ includes_dir: _includes
 collections:
   posts:
     output: true
+    permalink: /posts/:year-:month-:day-:title/
+    layout: post
 include:
 - .htaccess
 exclude:

@@ -23,22 +23,22 @@ class Criss::Resource
   def initialize(@site : Site, @slug : String, @content : String? = nil, @directory : String? = nil, frontmatter : Frontmatter? = nil)
     @has_frontmatter = !frontmatter.nil?
     @frontmatter = frontmatter || Frontmatter.new
-    if @directory == "_posts"
-      @frontmatter["permalink"] ||= "/posts/:year-:month-:day-:title/"
-      @frontmatter["layout"] ||= "post"
+  end
+
+  def [](key : String) : YAML::Any
+    @frontmatter.fetch(key) do
+      defaults[key]? || @collection.try(&.defaults[key]?) || raise KeyError.new
     end
   end
 
-  def [](key : String)
-    @frontmatter.fetch(key) { defaults.fetch(key) }
-  end
-
-  def []?(key : String)
-    @frontmatter.fetch(key) { defaults.fetch(key, nil) }
+  def []?(key : String) : YAML::Any?
+    @frontmatter.fetch(key) do
+      defaults[key]? || @collection.try(&.defaults[key]?)
+    end
   end
 
   def has_key?(key : String) : Bool
-    @frontmatter.has_key?(key) || defaults.has_key?(key)
+    @frontmatter.has_key?(key) || defaults.has_key?(key) || @collection.try(&.defaults.has_key?(key)) || false
   end
 
   @[Crinja::Attribute]

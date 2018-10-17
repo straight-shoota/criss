@@ -9,7 +9,7 @@ class Criss::Builder
     run_processors(site, site.files)
 
     site.collections.each_value do |collection|
-      run_processors(site, collection)
+      run_processors(site, collection.resources)
     end
   end
 

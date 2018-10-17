@@ -8,6 +8,13 @@ describe Criss::Site do
     site.config.should eq config
   end
 
+  it "#collections" do
+    config = Criss::Config.new
+    site = Criss::Site.new(config)
+    site.collections.keys.should eq ["posts"]
+    site.collections["posts"].defaults.should eq config.collections["posts"]
+  end
+
   it "#site_dir" do
     site = Criss::Site.new("spec/fixtures")
     site.site_dir.should eq File.join(Dir.current, "spec/fixtures")
@@ -22,7 +29,7 @@ describe Criss::Site do
     site.collections.size.should_not eq 0
 
     site.collections["posts"]?.should_not be_nil
-    site.collections["posts"].size.should_not eq 0
+    site.collections["posts"].resources.size.should_not eq 0
   end
 
   it "#run_processor" do

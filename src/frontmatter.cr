@@ -2,25 +2,25 @@ struct Criss::Frontmatter
   def initialize(@data = {} of YAML::Any => YAML::Any)
   end
 
-  def [](key : String)
-    @data[YAML::Any.new(key)].raw
+  def [](key : String) : YAML::Any
+    @data[YAML::Any.new(key)]
   end
 
-  def []?(key : String)
-    @data[YAML::Any.new(key)]?.try &.raw
+  def []?(key : String) : YAML::Any?
+    @data[YAML::Any.new(key)]?
   end
 
-  def fetch(key : String)
+  def fetch(key : String) : YAML::Any?
     @data.fetch(YAML::Any.new(key)) do
       yield
     end
   end
 
-  def fetch(key : String)
+  def fetch(key : String) : YAML::Any
     @data.fetch(YAML::Any.new(key))
   end
 
-  def fetch(key : String, default)
+  def fetch(key : String, default : YAML::Any) : YAML::Any
     @data.fetch(YAML::Any.new(key), default)
   end
 

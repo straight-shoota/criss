@@ -24,7 +24,7 @@ class Criss::Generator::Collections < Criss::Generator::Files
     @collection_paths.each do |collection_path|
       name = File.basename(collection_path).lchop('_')
       collection = site.collections.fetch(name) do
-        site.collections[name] = Collection.new
+        site.collections[name] = Collection.new(name)
       end
 
       real_path = File.expand_path(collection_path, site.site_dir)
@@ -32,7 +32,7 @@ class Criss::Generator::Collections < Criss::Generator::Files
         resource = Criss::Resource.new(site, slug, content, collection_path, frontmatter)
         resource.collection = collection
         resource.generator = self
-        collection << resource
+        collection.resources << resource
       end
     end
   end

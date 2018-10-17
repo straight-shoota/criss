@@ -6,7 +6,29 @@ class Criss::Config
     include YAML::Serializable::Unmapped
 
     property? output : Bool = true
-    property permalink : String? = nil
+
+    def initialize
+    end
+
+    def [](key : String) : YAML::Any
+      yaml_unmapped[key]
+    end
+
+    def []?(key : String) : YAML::Any?
+      yaml_unmapped[key]?
+    end
+
+    def []=(key : String, value : YAML::Any) : YAML::Any
+      yaml_unmapped[key] = value
+    end
+
+    def []=(key : String, value : YAML::Any::Type) : YAML::Any
+      self[key] = YAML::Any.new(value)
+    end
+
+    def has_key?(key : String) : Bool
+      yaml_unmapped.has_key?(key)
+    end
 
     def ==(other : Collection)
       {% for field in @type.instance_vars %}
@@ -24,6 +46,7 @@ class Criss::Config
   end
 
   def initialize(@site_dir : String = Dir.current)
+    merge_defaults
   end
 
   include YAML::Serializable
@@ -40,9 +63,7 @@ class Criss::Config
   property includes_dir : String = "_includes"
 
   # TODO: Add support for Array(String)
-  property collections : Hash(String, ::Criss::Config::Collection) = {
-    "posts" => ::Criss::Config::Collection.new,
-  }
+  property collections : Hash(String, ::Criss::Config::Collection) = {} of String => ::Criss::Config::Collection
 
   # Handling Reading
   # property? safe : Bool = false
@@ -122,9 +143,17 @@ class Criss::Config
     hasher
   end
 
+  def merge_defaults
+    posts = collections["posts"] ||= Config::Collection.new
+    posts["permalink"] ||= "/posts/:year-:month-:day-:title/"
+    posts["layout"] ||= "post"
+  end
+
   def self.load_file(filename : String) : Config
     File.open(filename, "r") do |io|
-      from_yaml(io)
+      from_yaml(io).tap do |config|
+        config.merge_defaults
+      end
     end
   end
 
