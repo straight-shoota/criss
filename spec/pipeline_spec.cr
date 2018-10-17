@@ -57,4 +57,17 @@ describe Criss::Pipeline::Builder do
     builder = Criss::Pipeline::Builder.new(site)
     builder.format_for_filename("foo.md").should eq "markdown"
   end
+
+  it "#output_ext" do
+    site = Criss::Site.new
+    builder = Criss::Pipeline::Builder.new(site)
+
+    builder.output_ext(".scss").should eq ".css"
+    builder.output_ext(".sass").should eq ".css"
+    builder.output_ext(".css").should eq nil
+    builder.output_ext(".html").should eq nil
+    builder.output_ext(".md").should eq ".html"
+    builder.output_ext(".markdown").should eq ".html"
+    builder.output_ext(".jpg").should eq nil
+  end
 end

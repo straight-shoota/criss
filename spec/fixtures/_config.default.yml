@@ -1,0 +1,43 @@
+---
+source: .
+destination: _site
+collections_dir: .
+layouts_dir: _layouts
+data_dir: _data
+includes_dir: _includes
+collections:
+  posts:
+    output: true
+include:
+- .htaccess
+exclude:
+- Gemfile
+- Gemfile.lock
+- node_modules
+- vendor/bundle/
+- vendor/cache/
+- vendor/gems/
+- vendor/ruby/
+keep_files:
+- .git
+- .svn
+encoding: utf-8
+markdown_ext: markdown,mkdown,mkdn,mkd,md
+future: false
+unpublished: false
+excerpt_separator: '
+
+
+'
+detach: false
+port: 4000
+host: 127.0.0.1
+baseurl: ""
+show_dir_listing: true
+livereload: true
+livereload_port: 35729
+permalink: date
+paginate_path: /page:num
+quiet: false
+verbose: false
+defaults: []

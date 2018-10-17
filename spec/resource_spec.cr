@@ -41,4 +41,20 @@ describe Criss::Resource do
       test_resource("foo/bar.html", frontmatter: Criss::Frontmatter{"domain" => "baz.com"}).output_path("/out").should eq "/out/baz.com/foo/bar.html"
     end
   end
+
+  it "#output_ext" do
+    test_resource("bar.sass", frontmatter: Criss::Frontmatter.new).output_ext.should eq ".css"
+    test_resource("bar.sass").output_ext.should eq ".sass"
+
+    test_resource("bar.scss", frontmatter: Criss::Frontmatter.new).output_ext.should eq ".css"
+    test_resource("bar.scss").output_ext.should eq ".scss"
+
+    test_resource("bar.css", frontmatter: Criss::Frontmatter.new).output_ext.should eq ".css"
+    test_resource("bar.html", frontmatter: Criss::Frontmatter.new).output_ext.should eq ".html"
+  end
+
+  it "#permalink" do
+    test_resource("bar.sass", frontmatter: Criss::Frontmatter.new).permalink.should eq "/bar.css"
+    test_resource("bar.scss", frontmatter: Criss::Frontmatter.new).permalink.should eq "/bar.css"
+  end
 end

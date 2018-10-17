@@ -6,20 +6,22 @@ class Criss::Processor::Layout < Criss::Processor
 
   transforms "*": "output"
 
-  getter crinja = ::Crinja.new
+  getter crinja : ::Crinja
 
   getter layouts_path
 
   getter layouts : Hash(String, {Template, Frontmatter})
 
   def self.new(site : Site)
-    new(File.expand_path("_layouts", site.source_path))
+    new(File.expand_path(site.config.layouts_dir, site.site_dir))
   end
 
   def initialize(@layouts_path : String = "_layouts")
     @layouts = Hash(String, {Template, Frontmatter}).new do |hash, key|
       hash[key] = load_layout(key)
     end
+
+    @crinja = ::Crinja.new
   end
 
   def process(resource : Resource, input : IO, output : IO) : Bool
@@ -35,8 +37,8 @@ class Criss::Processor::Layout < Criss::Processor
 
       variables = {
         "content" => ::Crinja::SafeString.new(content),
-        "layout" => ::Crinja.variables(frontmatter),
-        "post" => resource
+        "layout"  => ::Crinja.variables(frontmatter),
+        "post"    => resource,
       }
 
       layout_name = frontmatter["layout"]?
@@ -45,6 +47,9 @@ class Criss::Processor::Layout < Criss::Processor
         content = layout_template.render(variables)
       else
         layout_template.render(output, variables)
+
+        # Add a trailing newline
+        output.puts
         break
       end
     end

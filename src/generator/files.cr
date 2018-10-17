@@ -4,7 +4,7 @@ class Criss::Generator::Files < Criss::Generator
   end
 
   def generate : Nil
-    search_path = File.join(site.source_path, directory)
+    search_path = File.join(site.site_dir, directory)
     Files.load_files(File.join(search_path, "**"), search_path) do |slug, content, frontmatter|
       resource = Criss::Resource.new(site, slug, content, frontmatter: frontmatter)
       resource.generator = self
@@ -22,13 +22,13 @@ class Criss::Generator::Files < Criss::Generator
     end
   end
 
-  def self.load_content(file_path) : {Frontmatter, String}
+  def self.load_content(file_path) : {Frontmatter?, String}
     unless File.exists?(file_path)
       raise "File missing #{file_path}"
     end
 
     File.open(file_path, "r") do |file|
-      frontmatter = Frontmatter.read_frontmatter(file) || Frontmatter.new
+      frontmatter = Frontmatter.read_frontmatter(file)
       content = file.gets_to_end
 
       {frontmatter, content}

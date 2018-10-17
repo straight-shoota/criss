@@ -1,11 +1,14 @@
 require "./resource"
 require "./pipeline"
+require "./config"
 require "yaml"
 
 alias Criss::Collection = Array(Resource)
 
 class Criss::Site
-  getter source_path : String
+  getter config : Config
+
+  getter site_dir : String
 
   getter files : Array(Resource) = [] of Resource
   getter collections = {} of String => Array(Resource)
@@ -14,14 +17,16 @@ class Criss::Site
 
   getter pipeline_builder : Pipeline::Builder
 
-  def initialize(source_path = Dir.current)
-    @source_path = File.expand_path(source_path)
+  def initialize(@config : Config = Config.new)
+    @site_dir = File.expand_path(config.site_dir)
 
     @pipeline_builder = uninitialized Pipeline::Builder
     @pipeline_builder = Pipeline::Builder.new(self)
   end
 
-  property output_path = "_build"
+  def self.new(site_dir : String)
+    new Config.load(site_dir)
+  end
 
   def url : URI
     URI.new("http://example.com")

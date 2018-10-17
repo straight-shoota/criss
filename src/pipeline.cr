@@ -58,7 +58,7 @@ struct Criss::Pipeline
     end
 
     def transformation_for_extension(extension) : Processor::Transformation?
-      extension = extension.byte_slice(1, extension.bytesize)
+      extension = extension.lchop('.')
 
       @transforms.each do |transform|
         next if transform.from_wildcard? || transform.to_wildcard? || transform.from_first == transform.to_first
@@ -67,7 +67,7 @@ struct Criss::Pipeline
         if processor.responds_to? :file_extensions
           input_extensions = processor.file_extensions(transform.from)
         else
-          input_extensions = { transform.from }
+          input_extensions = {transform.from}
         end
 
         input_extensions.each do |input_ext|
@@ -95,16 +95,21 @@ struct Criss::Pipeline
       @register[format_for(resource)]
     end
 
+    def output_ext(input_ext : String) : String?
+      if transformation = transformation_for_extension(input_ext)
+        ".#{transformation.to}"
+      end
+    end
+
     def create_pipeline(format)
       segments = [] of Processor
       transformations = @transforms.dup
-
 
       while true
         format_first = format.partition('.').first
         transform = transformations.find do |transform|
           transform.from == format || transform.from == format_first ||
-          (transform.from_wildcard? && transform.to_first != format_first)
+            (transform.from_wildcard? && transform.to_first != format_first)
         end
 
         break unless transform

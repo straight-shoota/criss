@@ -15,6 +15,6 @@ describe "simple build spec" do
     builder = Criss::Builder.new(output_path)
     builder.build(site)
 
-    Process.run("diff", ["spec/fixtures/_build", output_path], output: STDOUT, error: STDERR).success?.should be_true
+    Process.run("diff", ["-r", "spec/fixtures/_build", output_path], output: STDOUT, error: STDERR).success?.should be_true
   end
 end

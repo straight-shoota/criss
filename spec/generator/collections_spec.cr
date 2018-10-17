@@ -9,7 +9,7 @@ describe Criss::Generator::Collections do
 
     resource = site.collections["posts"].first
     resource.slug.should eq "2017-07-16-my-first-post.html"
-    #resource.output_path("/").should eq "/2017-07-16-my-first-post.html"
+    # resource.output_path("/").should eq "/2017-07-16-my-first-post.html"
     resource.output_path("/").should eq "/posts/2017-07-16-my-first-post/index.html"
     resource.directory.should eq "_posts"
     resource.generator.should eq generator

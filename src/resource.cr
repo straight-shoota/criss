@@ -119,7 +119,20 @@ class Criss::Resource
 
   @[Crinja::Attribute]
   def permalink : String
-    File.join("/", (self["permalink"]? || File.join(File.dirname(slug || ""), "#{basename}#{output_ext}")).to_s)
+    if permalink = self["permalink"]?
+      permalink = permalink.as_s
+      unless permalink.starts_with?('/')
+        permalink = "/#{permalink}"
+      end
+      return permalink
+    end
+
+    dir = "/"
+    if slug = self.slug
+      dir = File.expand_path(File.dirname(slug), dir)
+    end
+
+    File.expand_path("#{basename}#{output_ext}", dir)
   end
 
   def crinja_attribute(value : Crinja::Value) : Crinja::Value
@@ -147,8 +160,13 @@ class Criss::Resource
   end
 
   def output_ext : String?
-    #site.pipeline_builder.format_for(self)
-    ".html"
+    extname = self.extname
+
+    if extname && has_frontmatter?
+      site.pipeline_builder.output_ext(extname) || extname
+    else
+      extname
+    end
   end
 
   def <=>(other : Entry)
@@ -156,7 +174,7 @@ class Criss::Resource
   end
 
   def to_s(io)
-    #io << self.class << "(" << @slug << ", " << content_type << ")"
+    # io << self.class << "(" << @slug << ", " << content_type << ")"
     io << @slug
   end
 
@@ -181,42 +199,38 @@ class Criss::Resource
       variable = match[1]? || match[2]
       case variable
       # when "title"         then !has_frontmatter? ? name : data["slug"] || Util.slugify(date_and_basename_without_ext.last, preserve_case: true)
-      when "title" then shortname.to_s
-      when "slug" then shortname.to_s.downcase
-      when "name" then name
-      when "basename"      then basename
+      when "title"      then shortname.to_s
+      when "slug"       then shortname.to_s.downcase
+      when "name"       then name
+      when "basename"   then basename
+      when "collection" then collection
+      when "output_ext" then output_ext
+        # when "num"           then data["paginator"].index
 
-      when "collection"    then collection
-      when "output_ext"    then output_ext
+        # when "digest"        then Digest::MD5.hexdigest(output) rescue ""
 
-      #when "num"           then data["paginator"].index
+      when "year"        then date.to_s("%Y")
+      when "month"       then date.to_s("%m")
+      when "day"         then date.to_s("%d")
+      when "hour"        then date.to_s("%H")
+      when "minute"      then date.to_s("%M")
+      when "second"      then date.to_s("%S")
+      when "i_day"       then date.to_s("%-d")
+      when "i_month"     then date.to_s("%-m")
+      when "short_month" then date.to_s("%b")
+      when "short_year"  then date.to_s("%y")
+      when "y_day"       then date.to_s("%j")
+        # when "categories" then
+        #   items = data["categories"].to_s
+        #   items = items.split(" ") if items.is_a?(String)
+        #   items.map { |category| Util.slugify(category) }.join("/")
 
-      #when "digest"        then Digest::MD5.hexdigest(output) rescue ""
-
-      when "year"          then date.to_s("%Y")
-      when "month"         then date.to_s("%m")
-      when "day"           then date.to_s("%d")
-      when "hour"          then date.to_s("%H")
-      when "minute"        then date.to_s("%M")
-      when "second"        then date.to_s("%S")
-      when "i_day"         then date.to_s("%-d")
-      when "i_month"       then date.to_s("%-m")
-      when "short_month"   then date.to_s("%b")
-      when "short_year"    then date.to_s("%y")
-      when "y_day"         then date.to_s("%j")
-
-      # when "categories" then
-      #   items = data["categories"].to_s
-      #   items = items.split(" ") if items.is_a?(String)
-      #   items.map { |category| Util.slugify(category) }.join("/")
-
-      when "path" then
+      when "path"
         path = File.dirname(@slug)
         # if path.start_with?("/")
         #   path = Util.relative_path(path, File.expand_path(data["base_dir"] || ".", directory))
         # end
         path == "." ? "" : path
-
       else
         raise "Unknown permalink variable #{variable.dump}"
       end

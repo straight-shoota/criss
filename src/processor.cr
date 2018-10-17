@@ -49,7 +49,6 @@ abstract class Criss::Processor
   # Returns `false` if processing is skipped for this resource.
   abstract def process(resource : Resource, input : IO, output : IO) : Bool
 
-
   # @@transforms = [] of Nil
 
   # def transformations : Array(Transformation)

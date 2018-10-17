@@ -2,9 +2,15 @@ require "spec"
 require "../src/site"
 
 describe Criss::Site do
-  it "#source_path" do
+  it ".new" do
+    config = Criss::Config.new
+    site = Criss::Site.new(config)
+    site.config.should eq config
+  end
+
+  it "#site_dir" do
     site = Criss::Site.new("spec/fixtures")
-    site.source_path.should eq File.join(Dir.current, "spec/fixtures")
+    site.site_dir.should eq File.join(Dir.current, "spec/fixtures")
   end
 
   it "#run_generators" do
@@ -17,7 +23,6 @@ describe Criss::Site do
 
     site.collections["posts"]?.should_not be_nil
     site.collections["posts"].size.should_not eq 0
-
   end
 
   it "#run_processor" do

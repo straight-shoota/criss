@@ -7,17 +7,17 @@ describe Criss::Processor::Layout do
     processor = Criss::Processor::Layout.new
     processor.layouts["page"] = {
       Crinja::Template.new("<page>{{ content }}</page>"),
-      Criss::Frontmatter{ "layout" => "base"}
+      Criss::Frontmatter{"layout" => "base"},
     }
     processor.layouts["base"] = {
       Crinja::Template.new("<base>{{ content }}</base>"),
-      Criss::Frontmatter.new
+      Criss::Frontmatter.new,
     }
     resource = Criss::Resource.new(site, "foo.md", frontmatter: Criss::Frontmatter{"layout" => "page"})
 
     String.build do |io|
       processor.process(resource, IO::Memory.new("Laus deo semper"), io).should be_true
-    end.should eq "<base><page>Laus deo semper</page></base>"
+    end.should eq "<base><page>Laus deo semper</page></base>\n"
   end
 
   it "none layout" do
@@ -46,6 +46,7 @@ describe Criss::Processor::Layout do
           Laus deo semper
         </body>
       </html>
+
       HTML
   end
 end

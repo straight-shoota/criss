@@ -12,7 +12,7 @@ class Criss::Processor::Crinja < Criss::Processor
   def process(resource : Resource, input : IO, output : IO) : Bool
     template = ::Crinja::Template.new(input.gets_to_end, crinja, resource.name || "", resource.slug || "")
     vars = ::Crinja.variables({
-      "page" => resource
+      "page" => resource,
     })
 
     template.render(output, vars)

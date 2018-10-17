@@ -2,13 +2,15 @@ require "sass"
 require "../processor"
 
 class Criss::Processor::Sass < Criss::Processor
-
   transforms "sass": "css", "scss": "css"
 
-  getter include_path = "_sass"
+  getter include_path : String
 
+  def self.new(site : Site)
+    new(File.expand_path("_sass", site.site_dir))
+  end
 
-  def initialize(site = nil)
+  def initialize(@include_path : String = "_sass")
   end
 
   def process(resource : Resource, input : IO, output : IO) : Bool

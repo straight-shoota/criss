@@ -15,7 +15,7 @@ describe Criss::Processor::Crinja do
   it "exposes frontmatter to template" do
     site = Criss::Site.new
     processor = Criss::Processor::Crinja.new
-    resource = Criss::Resource.new(site, "foo.md", frontmatter: Criss::Frontmatter { "foo" => "Bar" })
+    resource = Criss::Resource.new(site, "foo.md", frontmatter: Criss::Frontmatter{"foo" => "Bar"})
 
     String.build do |io|
       processor.process(resource, IO::Memory.new("Foo {{ page.foo }}"), io)

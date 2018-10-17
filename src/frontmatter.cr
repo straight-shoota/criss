@@ -52,8 +52,14 @@ struct Criss::Frontmatter
 
   def self.parse(source) : Frontmatter?
     yaml = YAML.parse(source)
-    if (hash = yaml.raw).is_a?(Hash)
-      Frontmatter.new(hash)
+
+    case raw = yaml.raw
+    when Hash
+      Frontmatter.new(raw)
+    when Nil
+      Frontmatter.new
+    else
+      raise "invalid Frontmatter"
     end
   end
 

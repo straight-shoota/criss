@@ -27,7 +27,7 @@ class Criss::Generator::Collections < Criss::Generator::Files
         site.collections[name] = Collection.new
       end
 
-      real_path = File.expand_path(collection_path, site.source_path)
+      real_path = File.expand_path(collection_path, site.site_dir)
       Files.load_files(File.join(real_path, "*"), real_path) do |slug, content, frontmatter|
         resource = Criss::Resource.new(site, slug, content, collection_path, frontmatter)
         resource.collection = collection
