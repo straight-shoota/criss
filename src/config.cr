@@ -45,14 +45,14 @@ class Criss::Config
     end
   end
 
-  def initialize(@site_dir : String = Dir.current)
+  def initialize(@site_dir : String = ".")
     merge_defaults
   end
 
   include YAML::Serializable
   include YAML::Serializable::Unmapped
 
-  property site_dir : String = Dir.current
+  property site_dir : String = "."
   property source : String = "."
   property destination : String = "_site"
   property collections_dir : String = "."
@@ -111,7 +111,7 @@ class Criss::Config
 
   property? quiet : Bool = false
   property? verbose : Bool = false
-  property defaults : Array(String) = [] of String
+  # property defaults : Array(String) = [] of String
 
   # property liquid
   #   property error_mode : String = "warn"

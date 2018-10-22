@@ -7,7 +7,7 @@ authors:
 
 targets:
   criss:
-    main: src/criss_cli.cr
+    main: src/app.cr
 
 license: MIT
 

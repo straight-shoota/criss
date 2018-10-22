@@ -1,12 +1,15 @@
 require "crinja"
 require "../processor"
+require "../crinja_lib"
 
 class Criss::Processor::Crinja < Criss::Processor
   transforms "crinja": "*", "jinja": "*", "liquid": "*"
 
-  getter crinja = ::Crinja.new
+  getter crinja : ::Crinja
 
   def initialize(site = nil)
+    @crinja = ::Crinja.new
+    @crinja.config.liquid_compatibility_mode = true
   end
 
   def process(resource : Resource, input : IO, output : IO) : Bool

@@ -1,5 +1,6 @@
 require "crinja"
 require "../processor"
+require "../crinja_lib"
 
 class Criss::Processor::Layout < Criss::Processor
   alias Template = ::Crinja::Template
@@ -13,15 +14,20 @@ class Criss::Processor::Layout < Criss::Processor
   getter layouts : Hash(String, {Template, Frontmatter})
 
   def self.new(site : Site)
-    new(File.expand_path(site.config.layouts_dir, site.site_dir))
+    new(
+      File.join(site.config.source, site.config.layouts_dir),
+      File.join(site.config.source, "_includes"),
+      site.site_dir)
   end
 
-  def initialize(@layouts_path : String = "_layouts")
+  def initialize(@layouts_path : String = "_layouts", includes_path = "_includes", @site_dir : String = ".")
     @layouts = Hash(String, {Template, Frontmatter}).new do |hash, key|
       hash[key] = load_layout(key)
     end
 
     @crinja = ::Crinja.new
+    @crinja.config.liquid_compatibility_mode = true
+    @crinja.loader = ::Crinja::Loader::FileSystemLoader.new(File.expand_path(includes_path, @site_dir))
   end
 
   def process(resource : Resource, input : IO, output : IO) : Bool
@@ -39,6 +45,7 @@ class Criss::Processor::Layout < Criss::Processor
         "content" => ::Crinja::SafeString.new(content),
         "layout"  => ::Crinja.variables(frontmatter),
         "post"    => resource,
+        "page"    => resource
       }
 
       layout_name = frontmatter["layout"]?
@@ -58,9 +65,9 @@ class Criss::Processor::Layout < Criss::Processor
   end
 
   def load_layout(layout_name : String) : {Template, Frontmatter}
-    file_path = Dir[File.join(layouts_path, "#{layout_name}.*")].first?
+    file_path = Dir[File.join(File.expand_path(layouts_path, @site_dir), "#{layout_name}.*")].first?
 
-    raise "Layout not found: #{layout_name}" unless file_path
+    raise "Layout not found: #{layout_name} (layouts_path: #{layouts_path})" unless file_path
 
     File.open(file_path) do |file|
       frontmatter = Frontmatter.read_frontmatter(file) || raise "empty frontmatter"

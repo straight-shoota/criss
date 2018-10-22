@@ -16,12 +16,12 @@ describe Criss::Site do
   end
 
   it "#site_dir" do
-    site = Criss::Site.new("spec/fixtures")
-    site.site_dir.should eq File.join(Dir.current, "spec/fixtures")
+    site = Criss::Site.new("spec/fixtures/simple-site")
+    site.site_dir.should eq File.join(Dir.current, "spec/fixtures/simple-site")
   end
 
   it "#run_generators" do
-    site = Criss::Site.new("spec/fixtures")
+    site = Criss::Site.new("spec/fixtures/simple-site")
 
     site.run_generators
 

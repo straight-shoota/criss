@@ -35,7 +35,7 @@ describe Criss::Processor::Layout do
 
   it "template loader" do
     site = Criss::Site.new
-    processor = Criss::Processor::Layout.new(layouts_path: "spec/fixtures/_layouts")
+    processor = Criss::Processor::Layout.new(layouts_path: "spec/fixtures/simple-site/_layouts")
     resource = Criss::Resource.new(site, "foo.md", frontmatter: Criss::Frontmatter{"layout" => "simple"})
 
     String.build do |io|

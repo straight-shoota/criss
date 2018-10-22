@@ -3,7 +3,7 @@ require "../../src/generator"
 
 describe Criss::Generator::Files do
   it "reads files" do
-    site = Criss::Site.new("spec/fixtures")
+    site = Criss::Site.new("spec/fixtures/simple-site")
     generator = Criss::Generator::Files.new(site)
     generator.generate
 

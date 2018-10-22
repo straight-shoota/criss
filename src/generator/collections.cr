@@ -2,7 +2,25 @@ require "./files"
 
 class Criss::Generator::Collections < Criss::Generator::Files
   def self.new(site : Site)
-    new(site, ["_posts"])
+    collections_dir = File.join(site.config.source, site.config.collections_dir)
+    paths = [] of String
+    site.collections.each_key do |collection_name|
+      directory = File.join(collections_dir, "_#{collection_name}")
+      full_path = File.expand_path(directory, site.site_dir)
+
+      if File.exists?(full_path)
+        paths << directory
+      elsif collections_dir != "."
+        directory = File.join(collections_dir, collection_name)
+        full_path = File.expand_path(directory, site.site_dir)
+
+        if File.exists?(full_path)
+          paths << directory
+        end
+      end
+    end
+
+    new(site, paths)
   end
 
   def self.new(site : Site, directory : String) : Collections

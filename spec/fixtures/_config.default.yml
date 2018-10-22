@@ -42,4 +42,3 @@ permalink: date
 paginate_path: /page:num
 quiet: false
 verbose: false
-defaults: []
