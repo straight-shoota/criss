@@ -18,7 +18,7 @@ describe Criss::Resource do
       resource.name.should eq "bar.html"
       resource.basename.should eq "bar"
       resource.extname.should eq ".html"
-      resource.has_frontmatter?.should be_false
+      resource.has_frontmatter?.should be_true
     end
   end
 
@@ -40,6 +40,13 @@ describe Criss::Resource do
       test_resource("foo/bar.html").output_path("/out").should eq "/out/foo/bar.html"
       test_resource("foo/bar.html", frontmatter: Criss::Frontmatter{"domain" => "baz.com"}).output_path("/out").should eq "/out/baz.com/foo/bar.html"
     end
+  end
+
+  it "#has_frontmatter" do
+    site = Criss::Site.new
+    resource = Criss::Resource.new(site, "foo/bar.html", frontmatter: nil)
+
+    resource.has_frontmatter?.should be_false
   end
 
   it "#output_ext" do

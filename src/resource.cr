@@ -20,7 +20,7 @@ class Criss::Resource
   property generator : Generator? = nil
   property collection : Collection? = nil
 
-  def initialize(@site : Site, @slug : String, @content : String? = nil, @directory : String? = nil, frontmatter : Frontmatter? = nil)
+  def initialize(@site : Site, @slug : String, @content : String? = nil, @directory : String? = nil, frontmatter : Frontmatter? = Frontmatter.new)
     @has_frontmatter = !frontmatter.nil?
     @frontmatter = frontmatter || Frontmatter.new
   end

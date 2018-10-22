@@ -70,7 +70,7 @@ class Criss::Processor::Layout < Criss::Processor
     raise "Layout not found: #{layout_name} (layouts_path: #{layouts_path})" unless file_path
 
     File.open(file_path) do |file|
-      frontmatter = Frontmatter.read_frontmatter(file) || raise "empty frontmatter"
+      frontmatter = Frontmatter.read_frontmatter(file) || Frontmatter.new
       content = file.gets_to_end
 
       template = Template.new(content, crinja, layout_name, file_path)

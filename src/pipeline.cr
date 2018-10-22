@@ -7,6 +7,10 @@ struct Criss::Pipeline
   end
 
   def pipe(resource : Resource)
+    unless resource.has_frontmatter?
+      return resource.content
+    end
+
     input = IO::Memory.new
     if content = resource.content
       input << content

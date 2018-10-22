@@ -42,3 +42,15 @@ class Crinja::Tag::Assign < Crinja::Tag::Set
 end
 
 Crinja::Tag::Library::TAGS << Crinja::Tag::Assign
+
+class Crinja::Tag::Highlight < Crinja::Tag
+  name "highlight", "endhighlight"
+
+  private def interpret(io : IO, renderer : Crinja::Renderer, tag_node : TagNode)
+    ArgumentsParser.new(tag_node.arguments, renderer.env.config).close
+
+    io << Crinja::SafeString.new(renderer.render(tag_node.block).value)
+  end
+end
+
+Crinja::Tag::Library::TAGS << Crinja::Tag::Highlight
