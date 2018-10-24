@@ -1,3 +1,5 @@
+require "html"
+
 Crinja.filter(:date_to_string) do
   value = target.raw
   if value.is_a?(Time)
@@ -14,6 +16,10 @@ end
 # TODO: Implement
 Crinja.filter(:relative_path) do
   target
+end
+
+Crinja.filter(:xml_escape) do
+  Crinja::SafeString.new(HTML.escape(target.as_s.to_s))
 end
 
 class Crinja::Tag::Unless < Crinja::Tag::If
@@ -47,9 +53,17 @@ class Crinja::Tag::Highlight < Crinja::Tag
   name "highlight", "endhighlight"
 
   private def interpret(io : IO, renderer : Crinja::Renderer, tag_node : TagNode)
-    ArgumentsParser.new(tag_node.arguments, renderer.env.config).close
+    args = ArgumentsParser.new(tag_node.arguments, renderer.env.config)
 
-    io << Crinja::SafeString.new(renderer.render(tag_node.block).value)
+    io << %(<figure class="highlight"><pre><code)
+    unless args.current_token.kind.eof?
+      language = args.current_token.value
+      io << %( class="language-#{language}" data-lang="#{language}")
+    end
+    io << %(>)
+    args.close
+    io << Crinja::SafeString.new(renderer.render(tag_node.block).value.chomp)
+    io << %(</code></pre></figure>)
   end
 end
 
