@@ -1,4 +1,5 @@
 require "./site"
+require "./priority"
 
 abstract class Criss::Processor
   record Transformation, processor : Processor, from : String, to : String do
@@ -59,12 +60,12 @@ abstract class Criss::Processor
   #   array
   # end
   abstract def transformations : Array(Transformation)
-  abstract def priority : Int32
+  abstract def priority : Priority
 
   macro inherited
-    macro transforms(priority = 0, **mappings)
-      def priority : Int32
-        \{{ priority }}
+    macro transforms(priority = :NORMAL, **mappings)
+      def priority : Priority
+        Priority::\{{ priority.id }}
       end
 
       def transformations : Array(Transformation)

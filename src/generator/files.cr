@@ -1,4 +1,6 @@
 class Criss::Generator::Files < Criss::Generator
+  getter priority : Priority = Priority::HIGH
+
   def initialize(@site : Site)
   end
 

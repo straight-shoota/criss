@@ -52,9 +52,17 @@ class Criss::Site
   def run_generators
     @generators << Generator::Collections.new(self)
     @generators << Generator::Files.new(self)
+    @generators << Generator::Pagination.new(self)
+
+    @generators.sort_by!(&.priority)
 
     @generators.each do |generator|
       generator.generate
+    end
+
+    @files.sort!
+    @collections.each_value do |collection|
+      collection.resources.sort!
     end
   end
 

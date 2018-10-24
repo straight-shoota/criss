@@ -3,11 +3,12 @@ require "uri"
 require "crinja"
 require "./generator"
 require "./frontmatter"
+require "./paginator"
 
-@[::Crinja::Attributes(expose: [slug, directory, content])]
+@[::Crinja::Attributes(expose: [slug, directory, content, paginator])]
 class Criss::Resource
   include ::Crinja::Object::Auto
-  # include Comparable(Entry)
+  include Comparable(Resource)
 
   getter site : Site
   getter slug : String
@@ -20,6 +21,7 @@ class Criss::Resource
   property? created_at : Time? = nil
   property generator : Generator? = nil
   property collection : Collection? = nil
+  property paginator : Paginator? = nil
 
   def initialize(@site : Site, @slug : String, @content : String? = nil, @directory : String? = nil,
                  frontmatter : Frontmatter? = Frontmatter.new, @defaults : Frontmatter = Frontmatter.new)
@@ -179,8 +181,13 @@ class Criss::Resource
     end
   end
 
-  def <=>(other : Entry)
-    0
+  def <=>(other : Resource)
+    if (date = self.date) && (other_date = other.date)
+      ret = other_date <=> date
+      return ret unless ret == 0
+    end
+
+    slug <=> other.slug
   end
 
   def to_s(io)

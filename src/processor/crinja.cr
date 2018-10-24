@@ -17,6 +17,7 @@ class Criss::Processor::Crinja < Criss::Processor
     vars = ::Crinja.variables({
       "page" => resource,
       "site" => resource.site,
+      "paginator" => resource.paginator,
     })
 
     template.render(output, vars)

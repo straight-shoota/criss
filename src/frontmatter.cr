@@ -103,4 +103,16 @@ struct Criss::Frontmatter
 
     false
   end
+
+  def dup
+    dup = Frontmatter.new
+    @data.each do |key, value|
+      dup.@data[key] = value
+    end
+    dup
+  end
+
+  def clone
+    dup
+  end
 end
