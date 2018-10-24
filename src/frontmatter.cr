@@ -43,11 +43,19 @@ struct Criss::Frontmatter
   end
 
   def self.read_frontmatter(io : IO)
-    return unless peek_string(io, "---\n")
+    return unless peek_frontmatter_delimiter(io)
 
-    frontmatter_io = IO::Delimited.new(io, "\n---\n")
+    frontmatter_io = IO::Delimited.new(io, "\n---")
 
-    parse(frontmatter_io)
+    frontmatter = parse(frontmatter_io)
+
+    if rest_of_line = io.gets
+      rest_of_line.each_char do |char|
+        raise "invalid frontmatter" unless char == '-'
+      end
+    end
+
+    frontmatter
   end
 
   def self.parse(source) : Frontmatter?
@@ -59,7 +67,7 @@ struct Criss::Frontmatter
     when Nil
       new
     else
-      raise "invalid Frontmatter"
+      raise "invalid frontmatter"
     end
   end
 
@@ -72,41 +80,27 @@ struct Criss::Frontmatter
     @data.merge!(other.@data)
   end
 
-  # private def self.peek_string(io, string)
-  #   peek = io.peek
-  #   return false unless peek.try &.size > 0
-
-  #   if peek.size < 4
-  #     # peek was to small, need to peek again
-  #     buffer = uninitialized UInt8[4]
-  #     buffer.to_slice.copy_from(peek)
-  #     next_peek = io.peek
-  #     return false unless next_peek && next_peek.size + peek.size >= 4
-  #     (buffer.to_slice + peek.size).copy_from(next_peek)
-  #     peek = buffer.to_slice
-  #   end
-
-  #   peek[0, 4] == "---\n".to_slice
-  # end
-
-  private def self.peek_string(io, string)
+  private def self.peek_frontmatter_delimiter(io)
     peek = io.peek
-    return false unless peek.try &.size > 0
 
-    peeked_bytes = Math.min(peek.size, string.bytesize)
-    return false unless peek[0, peeked_bytes] == string.to_slice[0, peeked_bytes]
+    return false unless peek && peek.size >= 3
 
-    if peeked_bytes < string.bytesize
-      peek = io.peek
-      return false unless peek.try &.size > 0
-
-      # We couldn't read the entire string in two peeks, so it's probably no
-      return false if peeked_bytes + peek.size < string.bytesize
-
-      count = string.bytesize - peeked_bytes
-      return peek[0, count] == string.to_slice[peeked_bytes, count]
+    dash_counter = 0
+    expect_lf = false
+    peek.each_with_index do |byte, index|
+      case byte
+      when '-'
+        return false if expect_lf
+        dash_counter += 1
+      when '\r'
+        expect_lf = true
+      when '\n'
+        return dash_counter == 3
+      else
+        return false
+      end
     end
 
-    true
+    false
   end
 end
