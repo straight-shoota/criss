@@ -15,7 +15,9 @@ class Criss::Builder
 
   def run_processors(site : Site, resources : Array(Resource))
     resources.each do |resource|
-      output_path = resource.output_path(@output_dir)
+      output_relative_path = resource.output_path
+      output_path = File.join(@output_dir, output_relative_path)
+
       FileUtils.mkdir_p(File.dirname(output_path))
 
       File.open(output_path, "w") do |file|

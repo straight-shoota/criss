@@ -37,8 +37,8 @@ describe Criss::Resource do
 
   describe "#output_path" do
     it do
-      test_resource("foo/bar.html").output_path("/out").should eq "/out/foo/bar.html"
-      test_resource("foo/bar.html", frontmatter: Criss::Frontmatter{"domain" => "baz.com"}).output_path("/out").should eq "/out/baz.com/foo/bar.html"
+      test_resource("foo/bar.html").output_path.should eq "/foo/bar.html"
+      test_resource("foo/bar.html", frontmatter: Criss::Frontmatter{"domain" => "baz.com"}).output_path.should eq "/baz.com/foo/bar.html"
     end
   end
 
@@ -63,6 +63,10 @@ describe Criss::Resource do
   it "#permalink" do
     test_resource("bar.sass", frontmatter: Criss::Frontmatter.new).permalink.should eq "/bar.css"
     test_resource("bar.scss", frontmatter: Criss::Frontmatter.new).permalink.should eq "/bar.css"
+  end
+
+  it "#expand_permalink" do
+    test_resource("2018-10-23-test.md", frontmatter: Criss::Frontmatter{"categories" => "foo bar"}).expand_permalink("pretty").should eq "/foo/bar/2018/10/23/test/"
   end
 
   describe "#[]" do

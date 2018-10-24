@@ -4,6 +4,7 @@ require "crinja"
 require "./generator"
 require "./frontmatter"
 require "./paginator"
+require "./ext/string"
 
 @[::Crinja::Attributes(expose: [slug, directory, content, paginator, categories])]
 class Criss::Resource
@@ -132,9 +133,10 @@ class Criss::Resource
       return permalink
     end
 
-    dir = "/"
     if slug = self.slug
-      dir = File.expand_path(File.dirname(slug), dir)
+      dir = File.expand_path(File.dirname(slug), "/")
+    else
+      dir = "/"
     end
 
     File.expand_path("#{basename}#{output_ext}", dir)
@@ -177,15 +179,20 @@ class Criss::Resource
     return [] of String
   end
 
-  def output_path(output_dir : String) : String
+  def output_path : String
     output_path = expand_permalink(permalink)
+
     if output_path.ends_with?('/')
       output_path = "#{output_path}/index#{output_ext || ".html"}"
     elsif File.extname(output_path).empty? && has_key?("permalink") && (output_ext = self.output_ext)
       output_path += output_ext
     end
 
-    File.expand_path(output_path.byte_slice(1, output_path.bytesize), File.join(output_dir, self["domain"]?.to_s))
+    if domain = self["domain"]?
+      output_path = File.join("/", domain.to_s, output_path)
+    end
+
+    output_path
   end
 
   def output_ext : String?
@@ -226,6 +233,14 @@ class Criss::Resource
   end
 
   def expand_permalink(permalink : String)
+    permalink = case permalink.lchop('/')
+      when "date"    then "/:categories/:year/:month/:day/:title:output_ext"
+      when "pretty"  then "/:categories/:year/:month/:day/:title/"
+      when "ordinal" then "/:categories/:year/:y_day/:title:output_ext"
+      when "none"    then "/:categories/:title:output_ext"
+      else permalink
+    end
+
     date, shortname = date_and_shortname_from_slug
     date ||= self.date
 
@@ -254,11 +269,7 @@ class Criss::Resource
       when "short_month" then date.to_s("%b")
       when "short_year"  then date.to_s("%y")
       when "y_day"       then date.to_s("%j")
-        # when "categories" then
-        #   items = data["categories"].to_s
-        #   items = items.split(" ") if items.is_a?(String)
-        #   items.map { |category| Util.slugify(category) }.join("/")
-
+      when "categories"  then categories.map(&.slugify).join("/")
       when "path"
         path = File.dirname(@slug)
         # if path.start_with?("/")
@@ -268,6 +279,6 @@ class Criss::Resource
       else
         raise "Unknown permalink variable #{variable.dump}"
       end
-    end
+    end.gsub(%r(//+), '/')
   end
 end

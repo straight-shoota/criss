@@ -148,7 +148,7 @@ class Criss::Config
 
   def merge_defaults
     posts = collections["posts"] ||= Config::Collection.new
-    posts["permalink"] ||= "/posts/:year-:month-:day-:title/"
+    posts["permalink"] ||= permalink
     posts["layout"] ||= "post"
   end
 
