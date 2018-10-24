@@ -1,5 +1,7 @@
 require "yaml"
 require "./frontmatter"
+require "./util/yaml_unmapped"
+require "./util/def_and_equals"
 
 @[Crinja::Attributes]
 class Criss::Config
@@ -7,44 +9,12 @@ class Criss::Config
     include YAML::Serializable
     include YAML::Serializable::Unmapped
     include ::Crinja::Object::Auto
+    include Util::YAMLUnmapped
+    include Util::DefAndEquals
 
     property? output : Bool = true
 
     def initialize
-    end
-
-    def [](key : String) : YAML::Any
-      yaml_unmapped[key]
-    end
-
-    def []?(key : String) : YAML::Any?
-      yaml_unmapped[key]?
-    end
-
-    def []=(key : String, value : YAML::Any) : YAML::Any
-      yaml_unmapped[key] = value
-    end
-
-    def []=(key : String, value : YAML::Any::Type) : YAML::Any
-      self[key] = YAML::Any.new(value)
-    end
-
-    def has_key?(key : String) : Bool
-      yaml_unmapped.has_key?(key)
-    end
-
-    def ==(other : Collection)
-      {% for field in @type.instance_vars %}
-        return false unless @{{field.id}} == other.@{{field.id}}
-      {% end %}
-      true
-    end
-
-    def hash(hasher)
-      {% for field in @type.instance_vars %}
-        hasher = @{{field.id}}.hash(hasher)
-      {% end %}
-      hasher
     end
 
     def crinja_attribute(value : Crinja::Value) : Crinja::Value
@@ -65,6 +35,7 @@ class Criss::Config
   class Defaults
     include YAML::Serializable
     include ::Crinja::Object::Auto
+    include Util::DefAndEquals
 
     property scope : Scope = Criss::Config::Scope.new
 
@@ -72,26 +43,13 @@ class Criss::Config
 
     def initialize(@scope : Scope = Scope.new, @values : Criss::Frontmatter = Criss::Frontmatter.new)
     end
-
-    def ==(other : Defaults)
-      {% for field in @type.instance_vars %}
-        return false unless @{{field.id}} == other.@{{field.id}}
-      {% end %}
-      true
-    end
-
-    def hash(hasher)
-      {% for field in @type.instance_vars %}
-        hasher = @{{field.id}}.hash(hasher)
-      {% end %}
-      hasher
-    end
   end
 
   @[Crinja::Attributes]
   struct Scope
     include YAML::Serializable
     include ::Crinja::Object::Auto
+    include Util::DefAndEquals
 
     getter path : String? = nil
 
@@ -108,6 +66,8 @@ class Criss::Config
   include YAML::Serializable
   include YAML::Serializable::Unmapped
   include ::Crinja::Object::Auto
+  include Util::YAMLUnmapped
+  include Util::DefAndEquals
 
   property site_dir : String = "."
   property source : String = "."
@@ -185,40 +145,6 @@ class Criss::Config
   #   property hard_wrap : Bool = false
   #   property footnote_nr : String = 1
   #   property show_warnings : Bool = false
-
-  def [](key : String) : YAML::Any
-    yaml_unmapped[key]
-  end
-
-  def []?(key : String) : YAML::Any?
-    yaml_unmapped[key]?
-  end
-
-  def []=(key : String, value : YAML::Any) : YAML::Any
-    yaml_unmapped[key] = value
-  end
-
-  def []=(key : String, value : YAML::Any::Type) : YAML::Any
-    self[key] = YAML::Any.new(value)
-  end
-
-  def has_key?(key : String) : Bool
-    yaml_unmapped.has_key?(key)
-  end
-
-  def ==(other : Config)
-    {% for field in @type.instance_vars %}
-      return false unless @{{field.id}} == other.@{{field.id}}
-    {% end %}
-    true
-  end
-
-  def hash(hasher)
-    {% for field in @type.instance_vars %}
-      hasher = @{{field.id}}.hash(hasher)
-    {% end %}
-    hasher
-  end
 
   def merge_defaults
     posts = collections["posts"] ||= Config::Collection.new
