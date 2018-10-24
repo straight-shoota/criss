@@ -34,4 +34,13 @@ describe Criss::Processor::Crinja do
     run_processor(resource, "{{ site.title }}").should eq "Foo Site"
     run_processor(resource, "{{ site.files[0].slug }}").should eq "foo.md"
   end
+
+  it "expose categories" do
+    site = Criss::Site.new
+
+    run_processor(Criss::Resource.new(site, "foo.md", frontmatter: Criss::Frontmatter{"categories" => "Foo"}), "{{ page.categories }}").should eq "['Foo']"
+    run_processor(Criss::Resource.new(site, "foo.md", frontmatter: Criss::Frontmatter{"categories" => [YAML::Any.new("Foo")]}), "{{ page.categories }}").should eq "['Foo']"
+    run_processor(Criss::Resource.new(site, "foo.md", frontmatter: Criss::Frontmatter{"category" => "Foo"}), "{{ page.categories }}").should eq "['Foo']"
+    run_processor(Criss::Resource.new(site, "foo.md"), "{{ page.categories }}").should eq "[]"
+  end
 end

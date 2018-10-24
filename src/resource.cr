@@ -5,7 +5,7 @@ require "./generator"
 require "./frontmatter"
 require "./paginator"
 
-@[::Crinja::Attributes(expose: [slug, directory, content, paginator])]
+@[::Crinja::Attributes(expose: [slug, directory, content, paginator, categories])]
 class Criss::Resource
   include ::Crinja::Object::Auto
   include Comparable(Resource)
@@ -158,6 +158,23 @@ class Criss::Resource
     end
 
     result
+  end
+
+  getter categories : Array(String) do
+    if (categories = self["categories"]?) && (categories = categories.raw)
+      if categories.is_a?(Array)
+        return categories.map(&.to_s).reject(&.empty?)
+      elsif categories.is_a?(String)
+        return categories.split(' ', remove_empty: true)
+      end
+    end
+    if (category = self["category"]?) && (category = category.raw)
+      if category.is_a?(String) && !category.empty?
+        return [category]
+      end
+    end
+
+    return [] of String
   end
 
   def output_path(output_dir : String) : String
