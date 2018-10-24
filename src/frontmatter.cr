@@ -55,12 +55,21 @@ struct Criss::Frontmatter
 
     case raw = yaml.raw
     when Hash
-      Frontmatter.new(raw)
+      new(raw)
     when Nil
-      Frontmatter.new
+      new
     else
       raise "invalid Frontmatter"
     end
+  end
+
+  # :nodoc:
+  def self.new(context : YAML::ParseContext, node : YAML::Nodes::Node)
+    new(Hash(YAML::Any, YAML::Any).new(context, node))
+  end
+
+  def merge!(other : Frontmatter)
+    @data.merge!(other.@data)
   end
 
   # private def self.peek_string(io, string)

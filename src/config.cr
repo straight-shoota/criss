@@ -1,4 +1,5 @@
 require "yaml"
+require "./frontmatter"
 
 class Criss::Config
   class Collection
@@ -42,6 +43,42 @@ class Criss::Config
         hasher = @{{field.id}}.hash(hasher)
       {% end %}
       hasher
+    end
+  end
+
+  class Defaults
+    include YAML::Serializable
+
+    property scope : Scope = Criss::Config::Scope.new
+
+    property values : Criss::Frontmatter = Criss::Frontmatter.new
+
+    def initialize(@scope : Scope = Scope.new, @values : Criss::Frontmatter = Criss::Frontmatter.new)
+    end
+
+    def ==(other : Collection)
+      {% for field in @type.instance_vars %}
+        return false unless @{{field.id}} == other.@{{field.id}}
+      {% end %}
+      true
+    end
+
+    def hash(hasher)
+      {% for field in @type.instance_vars %}
+        hasher = @{{field.id}}.hash(hasher)
+      {% end %}
+      hasher
+    end
+  end
+
+  struct Scope
+    include YAML::Serializable
+
+    getter path : String? = nil
+
+    getter type : String? = nil
+
+    def initialize(@path : String? = nil, @type : String? = nil)
     end
   end
 
@@ -111,7 +148,7 @@ class Criss::Config
 
   property? quiet : Bool = false
   property? verbose : Bool = false
-  # property defaults : Array(String) = [] of String
+  property defaults : Array(Criss::Config::Defaults) = [] of Criss::Config::Defaults
 
   # property liquid
   #   property error_mode : String = "warn"

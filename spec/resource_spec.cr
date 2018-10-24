@@ -64,4 +64,28 @@ describe Criss::Resource do
     test_resource("bar.sass", frontmatter: Criss::Frontmatter.new).permalink.should eq "/bar.css"
     test_resource("bar.scss", frontmatter: Criss::Frontmatter.new).permalink.should eq "/bar.css"
   end
+
+  describe "#[]" do
+    it "raises" do
+      site = Criss::Site.new
+      resource = Criss::Resource.new(site, "foo.md")
+
+      expect_raises(KeyError, %(Missing resource frontmatter key: "foo")) do
+        resource["foo"]
+      end
+    end
+
+    it "falls back to defaults" do
+      site = Criss::Site.new
+
+      defaults = Criss::Frontmatter {
+        "foo" => "bar",
+        "baz" => "not-baz"
+      }
+
+      resource = Criss::Resource.new(site, "foo.md", frontmatter: Criss::Frontmatter{"baz" => "baz"}, defaults: defaults)
+      resource["foo"].should eq "bar"
+      resource["baz"].should eq "baz"
+    end
+  end
 end

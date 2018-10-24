@@ -5,7 +5,8 @@ class Criss::Generator::Files < Criss::Generator
   def generate : Nil
     search_path = File.expand_path(site.config.source, site.site_dir)
     Files.load_files(File.join(search_path, "**/*"), search_path) do |slug, content, frontmatter|
-      resource = Criss::Resource.new(site, slug, content, frontmatter: frontmatter)
+      defaults = site.defaults_for(slug, "pages")
+      resource = Criss::Resource.new(site, slug, content, frontmatter: frontmatter, defaults: defaults)
       resource.generator = self
 
       site.files << resource

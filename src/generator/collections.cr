@@ -40,14 +40,15 @@ class Criss::Generator::Collections < Criss::Generator::Files
 
   def generate : Nil
     @collection_paths.each do |collection_path|
-      name = File.basename(collection_path).lchop('_')
-      collection = site.collections.fetch(name) do
-        site.collections[name] = Collection.new(name)
+      collection_name = File.basename(collection_path).lchop('_')
+      collection = site.collections.fetch(collection_name) do
+        site.collections[collection_name] = Collection.new(collection_name)
       end
 
       real_path = File.expand_path(collection_path, site.site_dir)
       Files.load_files(File.join(real_path, "*"), real_path) do |slug, content, frontmatter|
-        resource = Criss::Resource.new(site, slug, content, collection_path, frontmatter)
+        defaults = site.defaults_for(slug, collection_name)
+        resource = Criss::Resource.new(site, slug, content, collection_path, frontmatter, defaults: defaults)
         resource.collection = collection
         resource.generator = self
         collection.resources << resource

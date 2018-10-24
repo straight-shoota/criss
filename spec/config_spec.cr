@@ -19,4 +19,10 @@ describe Criss::Config do
   it ".load" do
     Criss::Config.load("spec/fixtures/simple-site/").should eq Criss::Config.new(site_dir: "spec/fixtures/simple-site/")
   end
+
+  it "loads complex file" do
+    config = Criss::Config.load_file("spec/fixtures/_config.complex.yml")
+    config.defaults[0].scope.path.should eq "posts/"
+    config.defaults[0].values["layout"].should eq "post"
+  end
 end

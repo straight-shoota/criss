@@ -54,4 +54,22 @@ class Criss::Site
 
     pipeline.pipe(io, resource)
   end
+
+  def defaults_for(path : String, type : String) : Frontmatter
+    frontmatter = Frontmatter.new
+
+    config.defaults.each do |defaults|
+      scope = defaults.scope
+
+      glob = scope.path
+      next if glob && !File.match?(glob, path)
+
+      scope_type = scope.type
+      next if scope_type && (scope_type != type)
+
+      frontmatter.merge!(defaults.values)
+    end
+
+    frontmatter
+  end
 end

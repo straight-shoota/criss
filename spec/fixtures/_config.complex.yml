@@ -1,0 +1,5 @@
+defaults:
+  - scope:
+      path: "posts/"
+    values:
+      layout: post

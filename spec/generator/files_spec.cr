@@ -30,4 +30,16 @@ describe Criss::Generator::Files do
   it "recognizes no frontmatter" do
     generate_files.find(&.slug.==("no-frontmatter.markdown")).not_nil!.has_frontmatter?.should be_false
   end
+
+  it "applies defaults" do
+    config = Criss::Config.new
+    config.site_dir = "spec/fixtures/simple-site"
+    config.defaults = [Criss::Config::Defaults.new(Criss::Config::Scope.new(type: "pages"), Criss::Frontmatter{"defaults_applied" => true})]
+
+    site = Criss::Site.new(config)
+    generator = Criss::Generator::Files.new(site)
+    generator.generate
+
+    site.files[0]["defaults_applied"].should be_true
+  end
 end

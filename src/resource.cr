@@ -13,21 +13,23 @@ class Criss::Resource
   getter directory : String?
   getter content : String?
   getter frontmatter : Frontmatter
-  getter defaults : Frontmatter = Frontmatter.new
+  getter defaults : Frontmatter
   getter? has_frontmatter : Bool
   property updated_at : Time? = nil
   property? created_at : Time? = nil
   property generator : Generator? = nil
   property collection : Collection? = nil
 
-  def initialize(@site : Site, @slug : String, @content : String? = nil, @directory : String? = nil, frontmatter : Frontmatter? = Frontmatter.new)
+  def initialize(@site : Site, @slug : String, @content : String? = nil, @directory : String? = nil,
+                 frontmatter : Frontmatter? = Frontmatter.new, @defaults : Frontmatter = Frontmatter.new)
+
     @has_frontmatter = !frontmatter.nil?
     @frontmatter = frontmatter || Frontmatter.new
   end
 
   def [](key : String) : YAML::Any
     @frontmatter.fetch(key) do
-      defaults[key]? || @collection.try(&.defaults[key]?) || raise KeyError.new
+      defaults[key]? || @collection.try(&.defaults[key]?) || raise KeyError.new "Missing resource frontmatter key: #{key.inspect}"
     end
   end
 
