@@ -4,6 +4,7 @@ require "crinja"
 require "./generator"
 require "./frontmatter"
 
+@[::Crinja::Attributes(expose: [slug, directory, content])]
 class Criss::Resource
   include ::Crinja::Object::Auto
   # include Comparable(Entry)
@@ -69,19 +70,19 @@ class Criss::Resource
     end
   end
 
+  @[Crinja::Attribute]
   getter date : Time do
     if date = self["date"]?
       date.raw.as(Time)
-      # elsif date = date_and_basename_without_ext.first
-      #   Time.new(*date.split('-'))
+    elsif date = date_and_shortname_from_slug.first
+      date
       # elsif @slug && File.exists?(@slug)
       #   File.mtime(@slug)
     else
-      Time.now
+      Time.now.at_beginning_of_day
     end
   end
 
-  @[Crinja::Attribute]
   getter url : URI do
     permalink = self["permalink"]?
     if permalink
@@ -138,6 +139,13 @@ class Criss::Resource
   end
 
   def crinja_attribute(value : Crinja::Value) : Crinja::Value
+    case value.to_string
+    when "url"
+      return Crinja::Value.new(url.to_s)
+    when "date"
+      return Crinja::Value.new(date)
+    end
+
     result = super
 
     if result.undefined?

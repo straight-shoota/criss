@@ -1,10 +1,12 @@
 require "yaml"
 require "./frontmatter"
 
+@[Crinja::Attributes]
 class Criss::Config
   class Collection
     include YAML::Serializable
     include YAML::Serializable::Unmapped
+    include ::Crinja::Object::Auto
 
     property? output : Bool = true
 
@@ -44,10 +46,25 @@ class Criss::Config
       {% end %}
       hasher
     end
+
+    def crinja_attribute(value : Crinja::Value) : Crinja::Value
+      result = super
+
+      if result.undefined?
+        key = value.to_string
+        if @yaml_unmapped.has_key?(key)
+          return Crinja::Value.new @yaml_unmapped.fetch(key)
+        end
+      end
+
+      result
+    end
   end
 
+  @[Crinja::Attributes]
   class Defaults
     include YAML::Serializable
+    include ::Crinja::Object::Auto
 
     property scope : Scope = Criss::Config::Scope.new
 
@@ -56,7 +73,7 @@ class Criss::Config
     def initialize(@scope : Scope = Scope.new, @values : Criss::Frontmatter = Criss::Frontmatter.new)
     end
 
-    def ==(other : Collection)
+    def ==(other : Defaults)
       {% for field in @type.instance_vars %}
         return false unless @{{field.id}} == other.@{{field.id}}
       {% end %}
@@ -71,8 +88,10 @@ class Criss::Config
     end
   end
 
+  @[Crinja::Attributes]
   struct Scope
     include YAML::Serializable
+    include ::Crinja::Object::Auto
 
     getter path : String? = nil
 
@@ -88,6 +107,7 @@ class Criss::Config
 
   include YAML::Serializable
   include YAML::Serializable::Unmapped
+  include ::Crinja::Object::Auto
 
   property site_dir : String = "."
   property source : String = "."
@@ -166,6 +186,26 @@ class Criss::Config
   #   property footnote_nr : String = 1
   #   property show_warnings : Bool = false
 
+  def [](key : String) : YAML::Any
+    yaml_unmapped[key]
+  end
+
+  def []?(key : String) : YAML::Any?
+    yaml_unmapped[key]?
+  end
+
+  def []=(key : String, value : YAML::Any) : YAML::Any
+    yaml_unmapped[key] = value
+  end
+
+  def []=(key : String, value : YAML::Any::Type) : YAML::Any
+    self[key] = YAML::Any.new(value)
+  end
+
+  def has_key?(key : String) : Bool
+    yaml_unmapped.has_key?(key)
+  end
+
   def ==(other : Config)
     {% for field in @type.instance_vars %}
       return false unless @{{field.id}} == other.@{{field.id}}
@@ -205,5 +245,18 @@ class Criss::Config
     end
 
     raise "Could not find CRISS config file in #{site_dir} (looking for #{alternatives.join(", ")})"
+  end
+
+  def crinja_attribute(value : Crinja::Value) : Crinja::Value
+    result = super
+
+    if result.undefined?
+      key = value.to_string
+      if @yaml_unmapped.has_key?(key)
+        return Crinja::Value.new @yaml_unmapped.fetch(key)
+      end
+    end
+
+    result
   end
 end

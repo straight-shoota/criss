@@ -16,6 +16,7 @@ class Criss::Processor::Crinja < Criss::Processor
     template = ::Crinja::Template.new(input.gets_to_end, crinja, resource.name || "", resource.slug || "")
     vars = ::Crinja.variables({
       "page" => resource,
+      "site" => resource.site,
     })
 
     template.render(output, vars)

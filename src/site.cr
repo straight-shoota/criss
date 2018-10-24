@@ -4,12 +4,16 @@ require "./config"
 require "./collection"
 require "yaml"
 
+@[::Crinja::Attributes(expose: [files, collections])]
 class Criss::Site
+  include ::Crinja::Object::Auto
+
   getter config : Config
 
   getter site_dir : String
 
   getter files : Array(Resource) = [] of Resource
+
   getter collections = {} of String => Collection
 
   getter generators : Array(Generator) = [] of Generator
@@ -34,6 +38,11 @@ class Criss::Site
 
   def self.new(site_dir : String)
     new Config.load(site_dir)
+  end
+
+  @[::Crinja::Attribute]
+  def posts : Array(Resource)
+    collections["posts"].resources
   end
 
   def url : URI
@@ -71,5 +80,15 @@ class Criss::Site
     end
 
     frontmatter
+  end
+
+  def crinja_attribute(value : Crinja::Value) : Crinja::Value
+    result = super
+
+    if result.undefined?
+      config.crinja_attribute(value)
+    else
+      result
+    end
   end
 end
