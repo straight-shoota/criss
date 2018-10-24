@@ -14,6 +14,15 @@ describe Criss::Generator::Files do
     generate_files.map(&.slug).should eq ["css/site.css", "folder/file.html", "index.md", "no-frontmatter.markdown", "simple.scss"]
   end
 
+  it "reads files with includes" do
+    site = Criss::Site.new("spec/fixtures/simple-site")
+    site.config.include = ["_include.html"]
+    generator = Criss::Generator::Files.new(site)
+    generator.generate
+
+    site.files.map(&.slug).should eq ["css/site.css", "folder/file.html", "index.md", "no-frontmatter.markdown", "simple.scss", "_include.html"]
+  end
+
   it "creates resource" do
     files = generate_files
     file = files[2]

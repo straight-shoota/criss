@@ -4,7 +4,7 @@ class Criss::Generator::Files < Criss::Generator
 
   def generate : Nil
     search_path = File.expand_path(site.config.source, site.site_dir)
-    Files.load_files(File.join(search_path, "**/*"), search_path) do |slug, content, frontmatter|
+    Files.load_files(File.join(search_path, "**/*"), search_path, excludes: site.config.exclude, includes: site.config.include) do |slug, content, frontmatter|
       defaults = site.defaults_for(slug, "pages")
       resource = Criss::Resource.new(site, slug, content, frontmatter: frontmatter, defaults: defaults)
       resource.generator = self
@@ -13,15 +13,20 @@ class Criss::Generator::Files < Criss::Generator
     end
   end
 
-  def self.load_files(glob, directory)
+  def self.load_files(glob, directory, excludes = [] of String, includes = [] of String)
     Dir.glob(glob) do |full_path|
       next if File.directory?(full_path)
 
       slug = full_path.lchop(directory).lchop('/')
 
-      next if slug.starts_with?('_')
-      # TODO: Don't traverse hidden directories in the first place.
-      next if slug.includes?("/_")
+      if !includes.any? { |glob| File.match?(glob, slug) } && (
+            slug.starts_with?('_') ||
+            # TODO: Don't traverse hidden directories in the first place.
+            slug.includes?("/_") ||
+            excludes.any? { |glob| File.match?(glob, slug) }
+          )
+        next
+      end
 
       frontmatter, content = load_content(full_path)
 
