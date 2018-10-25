@@ -15,22 +15,16 @@ describe Criss::Processor::Layout do
     }
     resource = Criss::Resource.new(site, "foo.md", frontmatter: Criss::Frontmatter{"layout" => "page"})
 
-    String.build do |io|
-      processor.process(resource, IO::Memory.new("Laus deo semper"), io).should be_true
-    end.should eq "<base><page>Laus deo semper</page></base>\n"
+    processor.process(resource, "Laus deo semper").should eq "<base><page>Laus deo semper</page></base>\n"
   end
 
   it "none layout" do
     site = Criss::Site.new
     processor = Criss::Processor::Layout.new
 
-    String.build do |io|
-      processor.process(Criss::Resource.new(site, "foo.md", frontmatter: Criss::Frontmatter{"layout" => "none"}), IO::Memory.new("Laus deo semper"), io).should be_false
-    end.should eq ""
+    processor.process(Criss::Resource.new(site, "foo.md", frontmatter: Criss::Frontmatter{"layout" => "none"}), "Laus deo semper").should be_nil
 
-    String.build do |io|
-      processor.process(Criss::Resource.new(site, "foo.md"), IO::Memory.new("Laus deo semper"), io).should be_false
-    end.should eq ""
+    processor.process(Criss::Resource.new(site, "foo.md"), "Laus deo semper").should be_nil
   end
 
   it "template loader" do
@@ -38,9 +32,7 @@ describe Criss::Processor::Layout do
     processor = Criss::Processor::Layout.new(layouts_path: "spec/fixtures/simple-site/_layouts")
     resource = Criss::Resource.new(site, "foo.md", frontmatter: Criss::Frontmatter{"layout" => "simple"})
 
-    String.build do |io|
-      processor.process(resource, IO::Memory.new("Laus deo semper"), io).should be_true
-    end.should eq <<-'HTML'
+    processor.process(resource,"Laus deo semper").should eq <<-'HTML'
       <html>
         <body>
           Laus deo semper

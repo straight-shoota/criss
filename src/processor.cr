@@ -50,6 +50,14 @@ abstract class Criss::Processor
   # Returns `false` if processing is skipped for this resource.
   abstract def process(resource : Resource, input : IO, output : IO) : Bool
 
+  def process(resource : Resource, input : String) : String?
+    String.build do |io|
+      unless process(resource, IO::Memory.new(input), io)
+        return nil
+      end
+    end
+  end
+
   # @@transforms = [] of Nil
 
   # def transformations : Array(Transformation)
