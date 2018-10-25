@@ -7,9 +7,14 @@ class Criss::Processor::Crinja < Criss::Processor
 
   getter crinja : ::Crinja
 
-  def initialize(site = nil)
+  def self.new(site : Site)
+    new(site.config.includes_dir, site.site_dir)
+  end
+
+  def initialize(includes_dir : String = "_includes", site_dir : String = ".")
     @crinja = ::Crinja.new
     @crinja.config.liquid_compatibility_mode = true
+    @crinja.loader = ::Crinja::Loader::FileSystemLoader.new(File.join(site_dir, includes_dir))
   end
 
   def process(resource : Resource, input : IO, output : IO) : Bool

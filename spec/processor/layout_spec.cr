@@ -41,4 +41,12 @@ describe Criss::Processor::Layout do
 
       HTML
   end
+
+  it "loads from includes dir" do
+    site = Criss::Site.new
+    resource = Criss::Resource.new(site, "foo.md", frontmatter: Criss::Frontmatter{"layout" => "include"})
+    processor = Criss::Processor::Layout.new(layouts_path: "spec/fixtures/simple-site/_layouts", includes_path: "spec/fixtures/simple-site/_includes")
+
+    processor.process(resource, "content").should eq "FOO included\n\ncontent\n"
+  end
 end

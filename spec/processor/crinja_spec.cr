@@ -43,4 +43,11 @@ describe Criss::Processor::Crinja do
     run_processor(Criss::Resource.new(site, "foo.md", frontmatter: Criss::Frontmatter{"category" => "Foo"}), "{{ page.categories }}").should eq "['Foo']"
     run_processor(Criss::Resource.new(site, "foo.md"), "{{ page.categories }}").should eq "[]"
   end
+
+  it "loads from includes dir" do
+    site = Criss::Site.new
+
+    processor = Criss::Processor::Crinja.new(site_dir: "spec/fixtures/simple-site")
+    processor.process(Criss::Resource.new(site, "foo.md"), "{% include foo.html %}").should eq "FOO included"
+  end
 end
