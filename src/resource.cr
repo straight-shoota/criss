@@ -76,7 +76,14 @@ class Criss::Resource
   @[Crinja::Attribute]
   getter date : Time do
     if date = self["date"]?
-      date.raw.as(Time)
+      case raw = date.raw
+      when Time
+        raw
+      when String
+        Time.parse_local(raw, "%Y-%m-%d %H:%M")
+      else
+        raise "Unknown date format (#{raw})"
+      end
     elsif date = date_and_shortname_from_slug.first
       date
       # elsif @slug && File.exists?(@slug)
