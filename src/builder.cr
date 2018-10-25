@@ -9,7 +9,11 @@ class Criss::Builder
     run_processors(site, site.files)
 
     site.collections.each_value do |collection|
-      run_processors(site, collection.resources)
+      begin
+        run_processors(site, collection.resources)
+      rescue exc
+        raise Exception.new("Error running processors for collection #{collection.name}", cause: exc)
+      end
     end
   end
 
@@ -21,7 +25,11 @@ class Criss::Builder
       FileUtils.mkdir_p(File.dirname(output_path))
 
       File.open(output_path, "w") do |file|
-        site.run_processor(file, resource)
+        begin
+          site.run_processor(file, resource)
+        rescue exc
+          raise Exception.new("Error running processor for #{resource.slug}", cause: exc)
+        end
       end
     end
   end

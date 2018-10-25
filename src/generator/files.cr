@@ -30,9 +30,13 @@ class Criss::Generator::Files < Criss::Generator
         next
       end
 
-      frontmatter, content = load_content(full_path)
+      begin
+        frontmatter, content = load_content(full_path)
 
-      yield slug, content, frontmatter
+        yield slug, content, frontmatter
+      rescue exc
+        raise Exception.new("Error in #{self.class.name} for file #{slug} (#{directory})", cause: exc)
+      end
     end
   end
 
