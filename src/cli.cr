@@ -67,6 +67,8 @@ class Criss::CLI
   end
 
   def run_command(command : String?, options)
+    start = Time.monotonic
+
     case command
     when "serve"
       # server.start
@@ -81,6 +83,8 @@ class Criss::CLI
     else
       puts "unrecognised command: #{command}"
     end
+
+    puts "Finished in #{Time.monotonic - start} seconds"
   end
 
   def run_list
@@ -99,14 +103,24 @@ class Criss::CLI
   def run_build
     site = create_site
 
-    site.run_generators
+    profile "Running generators" do
+      site.run_generators
+    end
 
     builder = Criss::Builder.new(site.config.destination)
-    builder.build(site)
+
+    profile "Running builder" do
+      builder.build(site)
+    end
   end
 
   def create_site
-    site = Criss::Site.new(source_path)
+    site = profile "Reading config" do
+      Criss::Site.new(source_path)
+    end
+
+    puts "         Source: #{site.config.source}"
+    puts "    Destination: #{site.config.destination}"
 
     site
   end
@@ -114,5 +128,18 @@ class Criss::CLI
   private def display_version_and_exit
     #puts Criss::VERSION
     exit
+  end
+
+  private def profile(section)
+    print section
+    (40 - section.size).times { print '.' }
+
+    start = Time.monotonic
+
+    begin
+      yield
+    ensure
+      puts " (#{Time.monotonic - start})"
+    end
   end
 end
