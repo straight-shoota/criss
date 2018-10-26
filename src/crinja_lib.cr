@@ -18,8 +18,35 @@ Crinja.filter(:relative_path) do
   target
 end
 
+# TODO: Implement
+Crinja.filter(:relative_url) do
+  target
+end
+
+# TODO: Implement
+Crinja.filter(:absolute_url) do
+  target
+end
+
+# TODO: Implement
+Crinja.filter(:localize) do
+  target
+end
+
+Crinja.filter(:normalize_whitespace) do
+  target.as_s.gsub(/\s+/, ' ')
+end
+
+Crinja.filter(:strip_index) do
+  target.as_s.sub(%r(/index\.html?$), "/")
+end
+
 Crinja.filter(:xml_escape) do
   Crinja::SafeString.new(HTML.escape(target.as_s.to_s))
+end
+
+Crinja.filter(:date_to_xmlschema) do
+  target.raw.as(Time).to_rfc3339
 end
 
 class Crinja::Tag::Unless < Crinja::Tag::If

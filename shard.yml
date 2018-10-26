@@ -15,8 +15,9 @@ dependencies:
   sass:
     github: straight-shoota/sass.cr
   crinja:
-    github: straight-shoota/crinja
-    tag: v0.4.0
+    #    github: straight-shoota/crinja
+    #    tag: v0.4.0
+    path: ../crinja
   markd:
     github: icyleaf/markd
   serve:

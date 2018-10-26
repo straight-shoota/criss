@@ -1,4 +1,5 @@
 require "crinja"
+require "crinja/liquid"
 require "../processor"
 require "../crinja_lib"
 
@@ -25,8 +26,7 @@ class Criss::Processor::Layout < Criss::Processor
       hash[key] = load_layout(key)
     end
 
-    @crinja = ::Crinja.new
-    @crinja.config.liquid_compatibility_mode = true
+    @crinja = ::Crinja.liquid_support
     @crinja.loader = ::Crinja::Loader::FileSystemLoader.new(File.expand_path(includes_path, @site_dir))
   end
 

@@ -1,4 +1,5 @@
 require "crinja"
+require "crinja/liquid"
 require "../processor"
 require "../crinja_lib"
 
@@ -14,8 +15,7 @@ class Criss::Processor::Crinja < Criss::Processor
   end
 
   def initialize(includes_dir : String = "_includes", site_dir : String = ".")
-    @crinja = ::Crinja.new
-    @crinja.config.liquid_compatibility_mode = true
+    @crinja = ::Crinja.liquid_support
     @crinja.loader = ::Crinja::Loader::FileSystemLoader.new(File.join(site_dir, includes_dir))
   end
 
