@@ -31,7 +31,8 @@ class Criss::Processor::Layout < Criss::Processor
   end
 
   def process(resource : Resource, input : IO, output : IO) : Bool
-    layout_name = resource["layout"]?
+    layout_name = resource["layout"]?.try &.as_s?
+
     if !layout_name || layout_name == "none"
       return false
     end
@@ -68,7 +69,7 @@ class Criss::Processor::Layout < Criss::Processor
   def load_layout(layout_name : String) : {Template, Frontmatter}
     file_path = Dir[File.join(File.expand_path(layouts_path, @site_dir), "#{layout_name}.*")].first?
 
-    raise "Layout not found: #{layout_name} (layouts_path: #{layouts_path})" unless file_path
+    raise "Layout not found: #{layout_name.inspect} (layouts_path: #{layouts_path})" unless file_path
 
     File.open(file_path) do |file|
       frontmatter = Frontmatter.read_frontmatter(file) || Frontmatter.new
