@@ -73,6 +73,18 @@ class Criss::Site
     end
   end
 
+  def find(url : String) : Resource?
+    url = URI.new(path: url)
+    @files.each do |file|
+      return file if file.url == url
+    end
+    @collections.each_value do |collection|
+      collection.resources.each do |resource|
+        return resource if resource.url == url
+      end
+    end
+  end
+
   def run_processor(io : IO, resource : Resource)
     pipeline = @pipeline_builder.pipeline_for(resource)
 
