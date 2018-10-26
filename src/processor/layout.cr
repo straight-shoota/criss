@@ -16,7 +16,7 @@ class Criss::Processor::Layout < Criss::Processor
   def self.new(site : Site)
     new(
       File.join(site.config.source, site.config.layouts_dir),
-      File.join(site.config.source, "_includes"),
+      File.join(site.config.source, site.config.includes_dir),
       site.site_dir)
   end
 

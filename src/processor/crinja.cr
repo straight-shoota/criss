@@ -8,7 +8,9 @@ class Criss::Processor::Crinja < Criss::Processor
   getter crinja : ::Crinja
 
   def self.new(site : Site)
-    new(site.config.includes_dir, site.site_dir)
+    new(
+      File.join(site.config.source, site.config.includes_dir),
+      site.site_dir)
   end
 
   def initialize(includes_dir : String = "_includes", site_dir : String = ".")
