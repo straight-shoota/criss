@@ -26,6 +26,8 @@ class Criss::Site
     @pipeline_builder = uninitialized Pipeline::Builder
     @pipeline_builder = Pipeline::Builder.new(self)
 
+    @time = Time.now
+
     init_collections
   end
 
@@ -43,6 +45,11 @@ class Criss::Site
   @[::Crinja::Attribute]
   def posts : Array(Resource)
     collections["posts"].resources
+  end
+
+  @[::Crinja::Attribute]
+  def time
+    @time
   end
 
   def url : URI
