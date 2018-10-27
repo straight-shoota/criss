@@ -10,24 +10,20 @@ class Criss::Processor::Layout < Criss::Processor
 
   getter crinja : ::Crinja
 
-  getter layouts_path
+  getter layouts_path : String
 
   getter layouts : Hash(String, {Template, Frontmatter})
 
-  def self.new(site : Site)
-    new(
-      File.join(site.config.source, site.config.layouts_dir),
-      File.join(site.config.source, site.config.includes_dir),
-      site.site_dir)
-  end
+  def initialize(@site : Site = Site.new, layouts_path : String? = nil, includes_path : String? = nil)
+    @layouts_path = layouts_path || File.join(site.config.source, site.config.layouts_dir)
+    includes_path ||= File.join(site.config.source, site.config.includes_dir)
 
-  def initialize(@layouts_path : String = "_layouts", includes_path = "_includes", @site_dir : String = ".")
     @layouts = Hash(String, {Template, Frontmatter}).new do |hash, key|
       hash[key] = load_layout(key)
     end
 
     @crinja = ::Crinja.liquid_support
-    @crinja.loader = ::Crinja::Loader::FileSystemLoader.new(File.expand_path(includes_path, @site_dir))
+    @crinja.loader = ::Crinja::Loader::FileSystemLoader.new(File.expand_path(includes_path, site.site_dir))
   end
 
   def process(resource : Resource, input : IO, output : IO) : Bool
@@ -47,7 +43,7 @@ class Criss::Processor::Layout < Criss::Processor
         "layout"  => ::Crinja.variables(frontmatter),
         "post"    => resource,
         "page"    => resource,
-        "site"    => resource.site
+        "site"    => @site
       }
 
       layout_name = frontmatter["layout"]?
@@ -67,9 +63,10 @@ class Criss::Processor::Layout < Criss::Processor
   end
 
   def load_layout(layout_name : String) : {Template, Frontmatter}
-    file_path = Dir[File.join(File.expand_path(layouts_path, @site_dir), "#{layout_name}.*")].first?
+    file_pattern = File.join(File.expand_path(layouts_path, @site.site_dir), "#{layout_name}.*")
+    file_path = Dir[file_pattern].first?
 
-    raise "Layout not found: #{layout_name.inspect} (layouts_path: #{layouts_path})" unless file_path
+    raise "Layout not found: #{layout_name.inspect} (layouts_path: #{layouts_path}) at #{file_pattern}" unless file_path
 
     File.open(file_path) do |file|
       frontmatter = Frontmatter.read_frontmatter(file) || Frontmatter.new
