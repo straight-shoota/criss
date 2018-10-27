@@ -20,7 +20,6 @@ class Criss::Resource
   getter? has_frontmatter : Bool
   property updated_at : Time? = nil
   property? created_at : Time? = nil
-  property generator : Generator? = nil
   property collection : Collection? = nil
   property paginator : Paginator? = nil
 

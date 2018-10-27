@@ -12,7 +12,6 @@ describe Criss::Generator::Collections do
     # resource.output_path("/").should eq "/2017-07-16-my-first-post.html"
     resource.output_path.should eq "/2017/07/16/my-first-post.html"
     resource.directory.should eq "_posts"
-    resource.generator.should eq generator
     resource.content.should eq "\n<p>Hello World!</p>\n"
     resource.title.should eq "My first post"
     resource["author"].should eq "straight-shoota"

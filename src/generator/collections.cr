@@ -50,7 +50,6 @@ class Criss::Generator::Collections < Criss::Generator::Files
         defaults = site.defaults_for(slug, collection_name)
         resource = Criss::Resource.new(site, slug, content, collection_path, frontmatter, defaults: defaults)
         resource.collection = collection
-        resource.generator = self
         collection.resources << resource
       end
     end
