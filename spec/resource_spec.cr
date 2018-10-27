@@ -1,8 +1,7 @@
 require "spec"
 require "../src/resource"
 
-def test_resource(slug, frontmatter = nil)
-  site = Criss::Site.new
+def test_resource(slug, frontmatter = nil, site = Criss::Site.new)
   Criss::Resource.new(site, slug, frontmatter: frontmatter)
 end
 
@@ -12,7 +11,6 @@ describe Criss::Resource do
       site = Criss::Site.new
       resource = Criss::Resource.new(site, "foo/bar.html")
 
-      resource.site.should eq site
       resource.slug.should eq "foo/bar.html"
 
       resource.name.should eq "bar.html"
@@ -47,17 +45,6 @@ describe Criss::Resource do
     resource = Criss::Resource.new(site, "foo/bar.html", frontmatter: nil)
 
     resource.has_frontmatter?.should be_false
-  end
-
-  it "#output_ext" do
-    test_resource("bar.sass", frontmatter: Criss::Frontmatter.new).output_ext.should eq ".css"
-    test_resource("bar.sass").output_ext.should eq ".sass"
-
-    test_resource("bar.scss", frontmatter: Criss::Frontmatter.new).output_ext.should eq ".css"
-    test_resource("bar.scss").output_ext.should eq ".scss"
-
-    test_resource("bar.css", frontmatter: Criss::Frontmatter.new).output_ext.should eq ".css"
-    test_resource("bar.html", frontmatter: Criss::Frontmatter.new).output_ext.should eq ".html"
   end
 
   it "#permalink" do

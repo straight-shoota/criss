@@ -70,4 +70,18 @@ describe Criss::Pipeline::Builder do
     builder.output_ext(".markdown").should eq ".html"
     builder.output_ext(".jpg").should eq nil
   end
+
+  it "#output_ext_for" do
+    site = Criss::Site.new
+    builder = Criss::Pipeline::Builder.new(site)
+
+    builder.output_ext_for(Criss::Resource.new(site, "bar.sass", frontmatter: Criss::Frontmatter.new)).should eq ".css"
+    builder.output_ext_for(Criss::Resource.new(site, "bar.sass", frontmatter: nil)).should eq ".sass"
+
+    builder.output_ext_for(Criss::Resource.new(site, "bar.scss", frontmatter: Criss::Frontmatter.new)).should eq ".css"
+    builder.output_ext_for(Criss::Resource.new(site, "bar.scss", frontmatter: nil)).should eq ".scss"
+
+    builder.output_ext_for(Criss::Resource.new(site, "bar.css", frontmatter: Criss::Frontmatter.new)).should eq ".css"
+    builder.output_ext_for(Criss::Resource.new(site, "bar.html", frontmatter: Criss::Frontmatter.new)).should eq ".html"
+  end
 end

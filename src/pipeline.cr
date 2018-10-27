@@ -105,6 +105,16 @@ struct Criss::Pipeline
       end
     end
 
+    def output_ext_for(resource : Resource) : String?
+      extname = resource.extname
+
+      if extname && resource.has_frontmatter?
+        output_ext(extname) || extname
+      else
+        extname
+      end
+    end
+
     def create_pipeline(format)
       segments = [] of Processor
       transformations = @transforms.dup

@@ -3,9 +3,8 @@ require "../../src/processor/markdown"
 
 describe Criss::Processor::Markdown do
   it "renders markdown" do
-    site = Criss::Site.new
     processor = Criss::Processor::Markdown.new
-    resource = Criss::Resource.new(site, "foo.md")
+    resource = Criss::Resource.new(nil, "foo.md")
 
     String.build do |io|
       processor.process(resource, IO::Memory.new("Foo *bar*"), io)

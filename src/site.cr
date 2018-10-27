@@ -109,6 +109,10 @@ class Criss::Site
     frontmatter
   end
 
+  def register(resource : Resource)
+    resource.output_ext = pipeline_builder.output_ext_for(resource)
+  end
+
   def crinja_attribute(value : Crinja::Value) : Crinja::Value
     result = super
 

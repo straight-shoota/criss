@@ -11,7 +11,6 @@ class Criss::Resource
   include ::Crinja::Object::Auto
   include Comparable(Resource)
 
-  getter site : Site
   getter slug : String
   getter directory : String?
   getter content : String?
@@ -22,12 +21,15 @@ class Criss::Resource
   property? created_at : Time? = nil
   property collection : Collection? = nil
   property paginator : Paginator? = nil
+  property output_ext : String? = nil
 
-  def initialize(@site : Site, @slug : String, @content : String? = nil, @directory : String? = nil,
+  def initialize(site : Site?, @slug : String, @content : String? = nil, @directory : String? = nil,
                  frontmatter : Frontmatter? = Frontmatter.new, @defaults : Frontmatter = Frontmatter.new)
 
     @has_frontmatter = !frontmatter.nil?
     @frontmatter = frontmatter || Frontmatter.new
+
+    site.try &.register(self)
   end
 
   def [](key : String) : YAML::Any
@@ -113,13 +115,13 @@ class Criss::Resource
       end
     end
 
-    base = @site.url
+    #base = @site.url
     # scheme = self["scheme"]
     # domain = self["domain"]
 
     # @url = if domain && base.host == @site.config["host"] && base.port == @site.config["port"]
     #   base.merge("/" + domain + path).to_s
-    if base.relative?
+    if false #base.relative?
       URI.parse(path)
     else
       # base.hostname = domain unless domain.nil?
@@ -199,16 +201,6 @@ class Criss::Resource
     end
 
     output_path
-  end
-
-  def output_ext : String?
-    extname = self.extname
-
-    if extname && has_frontmatter?
-      site.pipeline_builder.output_ext(extname) || extname
-    else
-      extname
-    end
   end
 
   def <=>(other : Resource)
