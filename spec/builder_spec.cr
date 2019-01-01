@@ -1,6 +1,6 @@
 require "spec"
 require "../src/builder"
-require "tempfile"
+require "./support/tempfile"
 require "file_utils"
 
 describe Criss::Builder do
@@ -8,11 +8,9 @@ describe Criss::Builder do
     site = Criss::Site.new
     site.files << Criss::Resource.new(site, "sample.md", "Foo **{{ page.name }}**")
 
-    output_path = Tempfile.tempname
-    Dir.mkdir(output_path)
-    builder = Criss::Builder.new(output_path)
-    builder.build(site)
-  ensure
-    FileUtils.rm_r(output_path) if output_path
+    with_tempfile("builder") do |output_path|
+      builder = Criss::Builder.new(output_path)
+      builder.build(site)
+    end
   end
 end

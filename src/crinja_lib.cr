@@ -13,6 +13,10 @@ Crinja.filter(:markdownify) do
   Crinja::SafeString.new(Markd.to_html(target.to_s))
 end
 
+Crinja.filter(:slugify) do
+  Crinja::Value.new(target.to_s.downcase.gsub(/([^\w_.]+)/, '-'))
+end
+
 # TODO: Implement
 Crinja.filter(:relative_path) do
   target

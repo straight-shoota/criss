@@ -20,7 +20,7 @@ describe Criss::Server do
 
     handler = Criss::Server::Handler.new(site)
 
-    response = send_request(handler, "/2017/08/07/markdown.html")
+    response = send_request(handler, "/2017/08/07/markdown/")
     response.success?.should be_true
     response.body.should eq File.read(File.join(site.site_dir, "/_build/2017/08/07/markdown.html"))
   end

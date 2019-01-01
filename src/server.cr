@@ -3,20 +3,25 @@ require "http/server"
 class Criss::Server
   getter site : Site
 
-  def initialize(@site : Site)
+  def self.new(site)
+    uri = URI.new("tcp", site.config.host, site.config.port, site.config.baseurl)
+
+    new(site, uri)
   end
 
-  def start(uri : String | URI)
-    @server = server = HTTP::Server.new [
+  def initialize(@site : Site, @uri : String | URI)
+    @server = HTTP::Server.new [
       HTTP::ErrorHandler.new,
       Handler.new(@site)
     ]
+  end
 
-    address = server.bind url
+  def start
+    address = @server.bind @uri
 
     puts "Listening on #{address}"
 
-    server.listen
+    @server.listen
   end
 
   class Handler
@@ -27,6 +32,10 @@ class Criss::Server
 
     def call(context : HTTP::Server::Context)
       path = context.request.path
+
+      # if path.ends_with?('/')
+      #   path = path + "index.html"
+      # end
 
       resource = @site.find(path)
 

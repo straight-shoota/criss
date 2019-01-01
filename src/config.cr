@@ -22,8 +22,8 @@ class Criss::Config
 
       if result.undefined?
         key = value.to_string
-        if @yaml_unmapped.has_key?(key)
-          return Crinja::Value.new @yaml_unmapped.fetch(key)
+        if unmapped_val = @yaml_unmapped[key]?
+          return Crinja::Value.new unmapped_val
         end
       end
 
@@ -178,8 +178,8 @@ class Criss::Config
 
     if result.undefined?
       key = value.to_string
-      if @yaml_unmapped.has_key?(key)
-        return Crinja::Value.new @yaml_unmapped.fetch(key)
+      if unmapped_val = @yaml_unmapped[key]?
+        return Crinja::Value.new unmapped_val
       end
     end
 

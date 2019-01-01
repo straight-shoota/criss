@@ -1,15 +1,18 @@
 require "spec"
 require "../src/resource"
 
-def test_resource(slug, frontmatter = nil, site = Criss::Site.new)
-  Criss::Resource.new(site, slug, frontmatter: frontmatter)
+def test_resource(slug, frontmatter = nil, site = Criss::Site.new, output_ext = nil)
+  resource = Criss::Resource.new(site, slug, frontmatter: frontmatter)
+  if output_ext
+    resource.output_ext = output_ext
+  end
+  resource
 end
 
 describe Criss::Resource do
   describe ".new" do
     it do
-      site = Criss::Site.new
-      resource = Criss::Resource.new(site, "foo/bar.html")
+      resource = Criss::Resource.new(nil, "foo/bar.html")
 
       resource.slug.should eq "foo/bar.html"
 
@@ -23,6 +26,13 @@ describe Criss::Resource do
   describe "#url" do
     it do
       test_resource("foo/bar.html").url.to_s.should eq "/foo/bar"
+    end
+  end
+
+  describe ".url_for" do
+    it do
+      Criss::Resource.url_for(test_resource("foo.md", output_ext: ".html")).to_s.should eq "/foo"
+      Criss::Resource.url_for(test_resource("foo/bar.html")).to_s.should eq "/foo/bar"
     end
   end
 

@@ -1,5 +1,6 @@
 require "./site"
 require "./builder"
+require "./server"
 require "option_parser"
 
 class Criss::CLI
@@ -61,8 +62,6 @@ class Criss::CLI
   end
 
   def run(options)
-    @option_parser.parse(options)
-
     run_command options.shift?, options
   end
 
@@ -71,7 +70,7 @@ class Criss::CLI
 
     case command
     when "serve"
-      # server.start
+      run_serve(options)
     when "list"
       run_list
     when "help", Nil
@@ -92,10 +91,26 @@ class Criss::CLI
 
     site.run_generators
 
+    pretty = PrettyPrint.new(@output)
+    @output.puts "# files"
+    site.files.each do |resource|
+      @output.puts resource.slug
+      resource.pretty_print(pretty)
+      pretty.flush
+      @output.puts "url:"
+      resource.url.pretty_print(pretty)
+      pretty.flush
+    end
+
     site.collections.each_value do |collection|
       @output.puts "# #{collection.name}"
       collection.resources.each do |resource|
         @output.puts resource.slug
+        resource.pretty_print(pretty)
+        pretty.flush
+        @output.puts "url:"
+        resource.url.pretty_print(pretty)
+        pretty.flush
       end
     end
   end
@@ -112,6 +127,37 @@ class Criss::CLI
     profile "Running builder" do
       builder.build(site)
     end
+  end
+
+  def run_serve(options)
+    port = nil
+    host = nil
+
+    @option_parser.on("-P PORT", "--port=PORT", "Specify port") do |port_option|
+      port = port_option.to_i
+    end
+    @option_parser.on("-H HOST", "--host=HOST", "Specify host") do |host_option|
+      host = host_option
+    end
+
+    @option_parser.parse(options)
+
+    site = create_site
+
+    if p = port
+      site.config.port = p
+    end
+    if h = host
+      site.config.host = h
+    end
+
+    profile "Running generators" do
+      site.run_generators
+    end
+
+    server = Criss::Server.new(site)
+
+    server.start
   end
 
   def create_site
@@ -131,15 +177,15 @@ class Criss::CLI
   end
 
   private def profile(section)
-    print section
-    (40 - section.size).times { print '.' }
+    @output.print section
+    (40 - section.size).times { @output.print '.' }
 
     start = Time.monotonic
 
     begin
       yield
     ensure
-      puts " (#{Time.monotonic - start})"
+      @output.puts " (#{Time.monotonic - start})"
     end
   end
 end

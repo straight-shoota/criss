@@ -111,6 +111,7 @@ class Criss::Site
 
   def register(resource : Resource)
     resource.output_ext = pipeline_builder.output_ext_for(resource)
+    resource.url = Resource.url_for(resource)
   end
 
   def crinja_attribute(value : Crinja::Value) : Crinja::Value

@@ -9,6 +9,7 @@ class Criss::Builder
     run_processors(site, site.files)
 
     site.collections.each_value do |collection|
+      puts "Building #{collection.name}..."
       begin
         run_processors(site, collection.resources)
       rescue exc
@@ -19,6 +20,7 @@ class Criss::Builder
 
   def run_processors(site : Site, resources : Array(Resource))
     resources.each do |resource|
+      puts "  #{resource.slug}"
       output_relative_path = resource.output_path
       output_path = File.join(@output_dir, output_relative_path)
 

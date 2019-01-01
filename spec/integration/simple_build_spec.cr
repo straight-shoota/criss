@@ -1,5 +1,5 @@
 require "spec"
-require "tempfile"
+require "../support/tempfile"
 require "../../src/site"
 require "../../src/builder"
 
@@ -9,12 +9,11 @@ describe "simple build spec" do
 
     site.run_generators
 
-    output_path = Tempfile.tempname
-    Dir.mkdir(output_path)
+    with_tempfile("simple_build") do |output_path|
+      builder = Criss::Builder.new(output_path)
+      builder.build(site)
 
-    builder = Criss::Builder.new(output_path)
-    builder.build(site)
-
-    Process.run("diff", ["-r", "spec/fixtures/simple-site/_build", output_path], output: STDOUT, error: STDERR).success?.should be_true
+      Process.run("diff", ["-r", "spec/fixtures/simple-site/_build", output_path], output: STDOUT, error: STDERR).success?.should be_true
+    end
   end
 end

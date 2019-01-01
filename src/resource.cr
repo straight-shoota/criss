@@ -22,6 +22,7 @@ class Criss::Resource
   property collection : Collection? = nil
   property paginator : Paginator? = nil
   property output_ext : String? = nil
+  property url : URI? = nil
 
   def initialize(site : Site?, @slug : String, @content : String? = nil, @directory : String? = nil,
                  frontmatter : Frontmatter? = Frontmatter.new, @defaults : Frontmatter = Frontmatter.new)
@@ -94,22 +95,27 @@ class Criss::Resource
     end
   end
 
-  getter url : URI do
-    permalink = self["permalink"]?
+  def self.url_for(resource : Resource) : URI
+    permalink = resource["permalink"]?
     if permalink
-      path = expand_permalink(permalink.as_s)
+      path = resource.expand_permalink(permalink.as_s)
     else
       path = String.build do |io|
         io << '/'
-        if slug = @slug
-          io << File.dirname(slug)
-          io << '/'
+        if slug = resource.slug
+          dirname = File.dirname(slug)
+          if dirname != "."
+            io << dirname
+            io << '/'
+          end
         end
 
+        basename = resource.basename
         if basename != "index"
           io << basename
+          output_ext = resource.output_ext
           if output_ext != ".html"
-            io << output_ext
+            io << resource.output_ext
           end
         end
       end
@@ -162,8 +168,8 @@ class Criss::Resource
 
     if result.undefined?
       key = value.to_string
-      if @frontmatter.has_key?(key)
-        return Crinja::Value.new @frontmatter.fetch(key)
+      if frontmatter_val = @frontmatter[key]?
+        return Crinja::Value.new frontmatter_val
       end
     end
 
@@ -277,6 +283,6 @@ class Criss::Resource
       else
         raise "Unknown permalink variable #{variable.dump}"
       end
-    end.gsub(%r(//+), '/')
+    end.gsub(%r(/\.?/+), '/')
   end
 end

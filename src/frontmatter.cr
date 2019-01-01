@@ -16,10 +16,6 @@ struct Criss::Frontmatter
     end
   end
 
-  def fetch(key : String) : YAML::Any
-    @data.fetch(YAML::Any.new(key))
-  end
-
   def fetch(key : String, default : YAML::Any) : YAML::Any
     @data.fetch(YAML::Any.new(key), default)
   end

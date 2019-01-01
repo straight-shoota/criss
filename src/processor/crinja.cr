@@ -11,11 +11,13 @@ class Criss::Processor::Crinja < Criss::Processor
   def self.new(site : Site)
     new(
       site,
-      File.join(site.config.source, site.config.includes_dir),
+
       site.site_dir)
   end
 
-  def initialize(@site : Site = Site.new, includes_dir : String = "_includes", site_dir : String = ".")
+  def initialize(@site : Site = Site.new,
+    includes_dir : String = File.join(site.config.source, site.config.includes_dir),
+    site_dir : String = site.site_dir)
     @crinja = ::Crinja.liquid_support
     @crinja.loader = ::Crinja::Loader::FileSystemLoader.new(File.join(site_dir, includes_dir))
   end

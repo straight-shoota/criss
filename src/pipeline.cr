@@ -20,6 +20,7 @@ struct Criss::Pipeline
     output = IO::Memory.new
 
     @processors.each do |processor|
+      puts "Processor #{processor.class}"
       result = processor.process(resource, input, output)
 
       # `as(Bool)` ensures all implementations return Bool
