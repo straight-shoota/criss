@@ -6,6 +6,12 @@ The *CRystal Instantaneous Static Site* is a static site generator and server mo
 
 ## Installation
 
+If you do not have libsass you will have to download it for your platform.
+MacOS:
+```bash
+brew install libsass
+```
+
 Download this repository and run `shards install && shards build`
 
 ## Usage
