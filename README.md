@@ -12,7 +12,7 @@ Download this repository and run `shards install && shards build`
 
 Run the executable `criss` inside a website folder. It now serves the content from this folder directly.
 
-Run `criss --help` for command line options.
+Run `criss help` for command line options.
 
 ## Development
 
