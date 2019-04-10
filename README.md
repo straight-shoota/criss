@@ -6,11 +6,7 @@ The *CRystal Instantaneous Static Site* is a static site generator and server mo
 
 ## Installation
 
-If you do not have libsass you will have to download it for your platform.
-MacOS:
-```bash
-brew install libsass
-```
+Criss relies on sass.cr, and some dependencies might be required on your system. Check out the [installation instructions for `sass.cr`](https://github.com/straight-shoota/sass.cr#installation) for more details.
 
 Download this repository and run `shards install && shards build`
 
