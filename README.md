@@ -6,6 +6,8 @@ The *CRystal Instantaneous Static Site* is a static site generator and server mo
 
 ## Installation
 
+Criss relies on sass.cr, and some dependencies might be required on your system. Check out the [installation instructions for `sass.cr`](https://github.com/straight-shoota/sass.cr#installation) for more details.
+
 Download this repository and run `shards install && shards build`
 
 ## Usage
